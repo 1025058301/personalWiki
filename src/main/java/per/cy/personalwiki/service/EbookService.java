@@ -10,6 +10,7 @@ import per.cy.personalwiki.pojo.DemoExample;
 import per.cy.personalwiki.pojo.Ebook;
 import per.cy.personalwiki.pojo.EbookExample;
 import per.cy.personalwiki.resp.EbookResp;
+import per.cy.personalwiki.utils.CopyUtil;
 import res.EbookRequest;
 
 import java.util.ArrayList;
@@ -20,19 +21,12 @@ public class EbookService {
     @Autowired
     EbookMapper ebookMapper;
 
-    public List<EbookResp> selectByExample(EbookRequest ebookRequest){
-        EbookExample example=new EbookExample();
-        EbookExample.Criteria criteria=example.createCriteria();
-        criteria.andNameLike("%"+ebookRequest.getName()+"%");//%是通配符，可以匹配零个或多个任意字符
-        List<Ebook> ebooks=ebookMapper.selectByExample(example);
-        List<EbookResp> ebookResps=new ArrayList<>();
-        for(Ebook ebook:ebooks){
-            EbookResp ebookResp=new EbookResp();
-            BeanUtils.copyProperties(ebook,ebookResp);
-            ebookResps.add(ebookResp);
-        }
-        return ebookResps;
+    public List<EbookResp> selectByExample(EbookRequest ebookRequest) {
+        EbookExample example = new EbookExample();
+        EbookExample.Criteria criteria = example.createCriteria();
+        criteria.andNameLike("%" + ebookRequest.getName() + "%");//%是通配符，可以匹配零个或多个任意字符
+        List<Ebook> ebooks = ebookMapper.selectByExample(example);
+        return CopyUtil.copyList(ebooks, EbookResp.class);
 
     }
-
 }
