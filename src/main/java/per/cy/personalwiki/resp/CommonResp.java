@@ -1,4 +1,4 @@
-package per.cy.personalwiki.Util;
+package per.cy.personalwiki.resp;
 
 public class CommonResp<T> {
 
