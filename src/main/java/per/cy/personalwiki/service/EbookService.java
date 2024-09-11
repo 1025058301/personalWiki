@@ -1,19 +1,14 @@
 package per.cy.personalwiki.service;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import per.cy.personalwiki.mapper.DemoMapper;
 import per.cy.personalwiki.mapper.EbookMapper;
-import per.cy.personalwiki.pojo.Demo;
-import per.cy.personalwiki.pojo.DemoExample;
 import per.cy.personalwiki.pojo.Ebook;
 import per.cy.personalwiki.pojo.EbookExample;
 import per.cy.personalwiki.resp.EbookResp;
 import per.cy.personalwiki.utils.CopyUtil;
-import res.EbookRequest;
+import per.cy.personalwiki.res.EbookRequest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

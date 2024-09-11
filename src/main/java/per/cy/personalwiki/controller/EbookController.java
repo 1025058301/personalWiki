@@ -4,10 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import per.cy.personalwiki.resp.CommonResp;
-import per.cy.personalwiki.pojo.Ebook;
 import per.cy.personalwiki.resp.EbookResp;
 import per.cy.personalwiki.service.EbookService;
-import res.EbookRequest;
+import per.cy.personalwiki.res.EbookRequest;
 
 import java.util.List;
 

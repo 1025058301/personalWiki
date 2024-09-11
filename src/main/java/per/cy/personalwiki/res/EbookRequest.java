@@ -1,4 +1,4 @@
-package res;
+package per.cy.personalwiki.res;
 
 public class EbookRequest {
     private Long id;
