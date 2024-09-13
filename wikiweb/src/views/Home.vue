@@ -78,7 +78,7 @@ import {defineComponent, onMounted, reactive, ref, toRef} from 'vue';
 import axios from 'axios';
 
 
-const listData: any = [];
+const listData: any[] = [];
 for (let i = 0; i < 23; i++) {
   listData.push({
     href: 'https://www.antdv.com/',
