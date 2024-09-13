@@ -45,12 +45,20 @@
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
+    <a-layout-content
+        :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
+    >
+      <pre>
+{{ebooks.books}}
+      </pre>
+    </a-layout-content>
   </a-layout>
+
 </template>
 
 <script lang="ts">
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
+import {defineComponent, onMounted, reactive, ref, toRef} from 'vue';
 import axios from 'axios';
 export default defineComponent({
   components: {
@@ -59,10 +67,16 @@ export default defineComponent({
     NotificationOutlined,
   },
   setup() {
-    axios.get("http://localhost:8080/ebook/list?name=boot").then((response)=>{
-      console.log(response);
-    })
+    const ebooks = reactive({books: []});
+    onMounted(()=>{
+      axios.get("http://localhost:8080/ebook/list?name=boot").then((response)=>{
+        console.log(response);
+        const data=response.data;
+        ebooks.books=data.content;
+      })
+    });
     return {
+      ebooks,
       selectedKeys1: ref<string[]>(['2']),
       selectedKeys2: ref<string[]>(['1']),
       collapsed: ref<boolean>(false),
