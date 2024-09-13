@@ -1,4 +1,3 @@
-
 <template>
   <a-layout-header class="header">
     <div class="logo" />
