@@ -37,6 +37,7 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <div v-if="state.loading">Loading...</div>
       <a-list item-layout="vertical" size="large" :grid="{ gutter: 20, column: 3 }" :data-source="ebooks.books">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
@@ -86,6 +87,7 @@ export default defineComponent({
   },
   setup() {
     const ebooks = reactive({books: []});
+    const state= reactive({loading:true});
     onMounted(()=>{
       console.log("on Mounted")
       axios.get("/ebook/list").then((response)=>{
@@ -94,7 +96,9 @@ export default defineComponent({
         ebooks.books=data.content;
       })
     });
+    state.loading=false;
     return {
+      state,
       ebooks,
       listData,
       pagination: {
