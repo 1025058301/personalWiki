@@ -87,13 +87,14 @@ export default defineComponent({
      **/
     const handleQuery = (params: any) => {
       state.loading = true;
-      axios.get("/ebook/list", params).then((response) => {
+      axios.get("/ebook/list", {params: {page: params.page, size: params.size}}).then((response) => {
         state.loading = false;
         const data = response.data;
-        ebooks.books = data.content;
+        ebooks.books = data.content.list;
 
         // 重置分页按钮
         pagination.current = params.page;
+        pagination.total = data.content.totalsPages;
       });
     };
 
@@ -109,7 +110,10 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      handleQuery({});
+      handleQuery({
+        page: 1,
+        size: pagination.pageSize
+      });
     });
 
     return {
