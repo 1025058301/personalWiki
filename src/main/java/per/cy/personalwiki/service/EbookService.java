@@ -11,6 +11,7 @@ import per.cy.personalwiki.mapper.EbookMapper;
 import per.cy.personalwiki.pojo.Ebook;
 import per.cy.personalwiki.pojo.EbookExample;
 import per.cy.personalwiki.resp.EbookResp;
+import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.utils.CopyUtil;
 import per.cy.personalwiki.req.EbookRequest;
 
@@ -22,19 +23,22 @@ public class EbookService {
     @Autowired
     EbookMapper ebookMapper;
 
-    public List<EbookResp> selectByExample(EbookRequest ebookRequest) {
+    public PageResp<EbookResp> selectByExample(EbookRequest ebookRequest) {
         EbookExample example = new EbookExample();
         EbookExample.Criteria criteria = example.createCriteria();
         if(!ObjectUtils.isEmpty(ebookRequest.getName())){
             criteria.andNameLike("%" + ebookRequest.getName() + "%");//%是通配符，可以匹配零个或多个任意字符
         }
-        PageHelper.startPage(2,3);
+        PageHelper.startPage(ebookRequest.getPage(),ebookRequest.getSize());
         List<Ebook> ebooks = ebookMapper.selectByExample(example);
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebooks);
         logger.info("总行数：{}", pageInfo.getTotal());
         logger.info("总页数：{}", pageInfo.getPages());
-        return CopyUtil.copyList(ebooks, EbookResp.class);
-
+        List<EbookResp> resList=CopyUtil.copyList(ebooks, EbookResp.class);
+        PageResp<EbookResp> resp=new PageResp<>();
+        resp.setList(resList);
+        resp.setTotalsPages((int)pageInfo.getTotal());
+        return resp;
 
     }
 }
