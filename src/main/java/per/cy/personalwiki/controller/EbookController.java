@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import per.cy.personalwiki.resp.CommonResp;
 import per.cy.personalwiki.resp.EbookResp;
 import per.cy.personalwiki.service.EbookService;
-import per.cy.personalwiki.res.EbookRequest;
+import per.cy.personalwiki.req.EbookRequest;
 
 import java.util.List;
 
