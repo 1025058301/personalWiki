@@ -1,6 +1,6 @@
 package per.cy.personalwiki.req;
 
-public class EbookRequest extends PageRequest {
+public class EbookQueryRequest extends PageRequest {
     private Long id;
 
     private String name;

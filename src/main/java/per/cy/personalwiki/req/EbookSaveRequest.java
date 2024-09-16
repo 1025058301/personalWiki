@@ -1,6 +1,6 @@
-package per.cy.personalwiki.resp;
+package per.cy.personalwiki.req;
 
-public class EbookResp {
+public class EbookSaveRequest {
     private Long id;
 
     private String name;

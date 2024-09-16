@@ -138,10 +138,18 @@ export default defineComponent({
     const modal = reactive({loading: false, visible: false});
     const handleModalOk = () => {
       modal.loading = true;
-      setTimeout(() => {
-        modal.visible = false;
-        modal.loading = false;
-      }, 2000);
+      axios.post("/ebook/save", ebook).then((response) => {
+        const data = response.data;
+        if(data.success){
+          handleQuery({
+            page: pagination.current,
+            size: pagination.pageSize,
+          });
+          modal.loading=false;
+          modal.visible=false;
+        }
+      });
+
     };
 
     /**
