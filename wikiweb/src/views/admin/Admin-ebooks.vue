@@ -16,7 +16,7 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <a-button type="primary">
+            <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
             <a-button type="danger">
@@ -27,6 +27,30 @@
       </a-table>
     </a-layout-content>
   </a-layout>
+  <a-modal
+      title="电子书表单"
+      v-model:visible="modal.visible"
+      :confirm-loading="modal.loading"
+      @ok="handleModalOk"
+  >
+    <a-form :model="ebook" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="封面">
+        <a-input v-model:value="ebook.cover"/>
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="ebook.name"/>
+      </a-form-item>
+      <a-form-item label="分类一">
+        <a-input v-model:value="ebook.category1Id"/>
+      </a-form-item>
+      <a-form-item label="分类二">
+        <a-input v-model:value="ebook.category2Id"/>
+      </a-form-item>
+      <a-form-item label="描述">
+        <a-input v-model:value="ebook.desc" type="textarea"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
 </template>
 
 <script lang="ts">
@@ -36,7 +60,8 @@ import axios from 'axios';
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
-    const ebooks = reactive({books: []});
+    const ebooks = reactive({books: []});//存放当前页展示的电子书
+    const ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', desc: ''});//存放当前编辑的电子书的信息
     const state = reactive({loading: false});
     const pagination = reactive({
       current: 1,
@@ -109,6 +134,24 @@ export default defineComponent({
       });
     };
 
+    // -------- 表单 ---------
+    const modal = reactive({loading: false, visible: false});
+    const handleModalOk = () => {
+      modal.loading = true;
+      setTimeout(() => {
+        modal.visible = false;
+        modal.loading = false;
+      }, 2000);
+    };
+
+    /**
+     * 编辑
+     */
+    const edit = (record: any) => {
+      modal.visible = true;
+      Object.assign(ebook,record)
+    };
+
     onMounted(() => {
       handleQuery({
         page: 1,
@@ -118,10 +161,14 @@ export default defineComponent({
 
     return {
       ebooks,
+      ebook,
       pagination,
       columns,
       state,
-      handleTableChange
+      modal,
+      handleTableChange,
+      handleModalOk,
+      edit,
     }
   }
 });
