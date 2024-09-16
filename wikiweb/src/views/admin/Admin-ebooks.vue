@@ -68,6 +68,7 @@
 <script lang="ts">
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
+import { message } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -77,7 +78,7 @@ export default defineComponent({
     const state = reactive({loading: false});
     const pagination = reactive({
       current: 1,
-      pageSize: 3,
+      pageSize: 4,
       total: 0
     });
 
@@ -127,11 +128,14 @@ export default defineComponent({
       axios.get("/ebook/list", {params: {page: params.page, size: params.size}}).then((response) => {
         state.loading = false;
         const data = response.data;
-        ebooks.books = data.content.list;
-
-        // 重置分页按钮
-        pagination.current = params.page;
-        pagination.total = data.content.totalsPages;
+        if(data.success){
+          ebooks.books = data.content.list;
+          // 重置分页按钮
+          pagination.current = params.page;
+          pagination.total = data.content.totalsPages;
+        }else {
+          message.error(data.message);
+        }
       });
     };
 
@@ -152,13 +156,15 @@ export default defineComponent({
       modal.loading = true;
       axios.post("/ebook/save", ebook).then((response) => {
         const data = response.data;
+        modal.loading=false;
         if(data.success){
           handleQuery({
             page: pagination.current,
             size: pagination.pageSize,
           });
-          modal.loading=false;
           modal.visible=false;
+        }else {
+          message.error(data.message);
         }
       });
 

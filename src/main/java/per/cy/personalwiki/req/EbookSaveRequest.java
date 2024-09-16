@@ -1,8 +1,12 @@
 package per.cy.personalwiki.req;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class EbookSaveRequest {
     private Long id;
 
+    @NotEmpty(message = "【电子书名字】不可为空")
     private String name;
 
     private Long category1Id;
