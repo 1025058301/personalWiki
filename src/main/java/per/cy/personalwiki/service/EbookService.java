@@ -15,6 +15,7 @@ import per.cy.personalwiki.resp.EbookQueryResp;
 import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.utils.CopyUtil;
 import per.cy.personalwiki.req.EbookQueryRequest;
+import per.cy.personalwiki.utils.SnowFlake;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class EbookService {
     @Autowired
     EbookMapper ebookMapper;
 
+    @Autowired
+    SnowFlake snowFlake;
     public PageResp<EbookQueryResp> selectByExample(EbookQueryRequest ebookQueryRequest) {
         EbookExample example = new EbookExample();
         EbookExample.Criteria criteria = example.createCriteria();
@@ -44,6 +47,7 @@ public class EbookService {
     public void saveEbook(EbookSaveRequest ebookSaveRequest){
         Ebook ebook=CopyUtil.copyInstance(ebookSaveRequest,Ebook.class);
         if(ObjectUtils.isEmpty(ebook.getId())){
+            ebook.setId(snowFlake.nextId());
             ebookMapper.insert(ebook);
         }else {
             ebookMapper.updateByPrimaryKey(ebook);

@@ -3,6 +3,11 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <p>
+        <a-button type="primary" @click="add()" size="large">
+          新增
+        </a-button>
+      </p>
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -60,8 +65,8 @@ import axios from 'axios';
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
-    const ebooks = reactive({books: []});//存放当前页展示的电子书
-    const ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', desc: ''});//存放当前编辑的电子书的信息
+    let ebooks = reactive({books: []});//存放当前页展示的电子书
+    let ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', desc: ''});//存放当前编辑的电子书的信息
     const state = reactive({loading: false});
     const pagination = reactive({
       current: 1,
@@ -159,6 +164,10 @@ export default defineComponent({
       modal.visible = true;
       Object.assign(ebook,record)
     };
+    const add = () => {
+      modal.visible = true;
+      Object.assign(ebook, {cover: '', name: '', category1Id: '', category2Id: '', desc: ''});
+    };
 
     onMounted(() => {
       handleQuery({
@@ -177,6 +186,7 @@ export default defineComponent({
       handleTableChange,
       handleModalOk,
       edit,
+      add
     }
   }
 });
