@@ -1,9 +1,7 @@
 package per.cy.personalwiki.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import per.cy.personalwiki.req.EbookSaveRequest;
 import per.cy.personalwiki.resp.CommonResp;
 import per.cy.personalwiki.resp.EbookQueryResp;
@@ -28,6 +26,12 @@ public class EbookController {
     public CommonResp saveEbook(@RequestBody EbookSaveRequest ebookSaveRequest) {//RequestBody用于接收json类型的参数
         CommonResp commonResp=new CommonResp<>();
         ebookService.saveEbook(ebookSaveRequest);
+        return commonResp;
+    }
+    @DeleteMapping ("/delete/{id}")
+    public CommonResp deleteEbook(@PathVariable("id")long id) {//RequestBody用于接收json类型的参数
+        CommonResp commonResp=new CommonResp<>();
+        ebookService.deleteEbook(id);
         return commonResp;
     }
 }

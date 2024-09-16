@@ -24,9 +24,16 @@
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
-            <a-button type="danger">
-              删除
-            </a-button>
+            <a-popconfirm
+                title="删除后不可恢复，确认删除?"
+                ok-text="是"
+                cancel-text="否"
+                @confirm="handleDelete(record.id)"
+            >
+              <a-button type="danger">
+                删除
+              </a-button>
+            </a-popconfirm>
           </a-space>
         </template>
       </a-table>
@@ -52,7 +59,7 @@
         <a-input v-model:value="ebook.category2Id"/>
       </a-form-item>
       <a-form-item label="描述">
-        <a-input v-model:value="ebook.desc" type="textarea"/>
+        <a-input v-model:value="ebook.description" type="textarea"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -66,7 +73,7 @@ export default defineComponent({
   name: 'AdminEbook',
   setup() {
     let ebooks = reactive({books: []});//存放当前页展示的电子书
-    let ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', desc: ''});//存放当前编辑的电子书的信息
+    let ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', description: ''});//存放当前编辑的电子书的信息
     const state = reactive({loading: false});
     const pagination = reactive({
       current: 1,
@@ -166,7 +173,27 @@ export default defineComponent({
     };
     const add = () => {
       modal.visible = true;
-      Object.assign(ebook, {cover: '', name: '', category1Id: '', category2Id: '', desc: ''});
+      Object.assign(ebook, {cover: '', name: '', category1Id: '', category2Id: '', description: ''});
+    };
+
+    const handleDelete = (id:number) => {
+      axios.delete("/ebook/delete/"+id).then((response) => {
+        const data = response.data;
+        if(data.success){
+          if(ebooks.books.length==1 && pagination.current > 1){
+            handleQuery({
+              page: pagination.current-1,
+              size: pagination.pageSize,
+            });
+          }else {
+            handleQuery({
+              page: pagination.current,
+              size: pagination.pageSize,
+            });
+          }
+        }
+      });
+
     };
 
     onMounted(() => {
@@ -185,6 +212,7 @@ export default defineComponent({
       modal,
       handleTableChange,
       handleModalOk,
+      handleDelete,
       edit,
       add
     }
