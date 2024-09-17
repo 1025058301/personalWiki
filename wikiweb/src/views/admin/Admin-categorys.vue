@@ -15,7 +15,7 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="categorys.items"
+          :data-source="level1.items"
           :pagination="false"
           :loading="state.loading"
       >
@@ -66,6 +66,7 @@
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
+import { Item, TreeNode, buildTree } from '@/utils/tool'
 
 export default defineComponent({
   name: 'AdminCategory',
@@ -95,6 +96,20 @@ export default defineComponent({
         slots: {customRender: 'action'}
       }
     ];
+    /**
+     * 一级分类树，children属性就是二级分类
+     * [{
+     *   id: "",
+     *   name: "",
+     *   children: [{
+     *     id: "",
+     *     name: "",
+     *   }]
+     * }]
+     */
+    const level1 = reactive<{ items: TreeNode[] }>({
+      items: []
+    }); // 一级分类树，children属性就是二级分类
 
     /**
      * 数据查询
@@ -106,7 +121,11 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           categorys.items = data.content;
-          // 重置分页按钮
+          console.log("原始数组：", categorys.items);
+
+          level1.items = buildTree(categorys.items,'0');
+          console.log(buildTree(categorys.items,'0'));
+          console.log("树形结构：", level1);
         } else {
           message.error(data.message);
         }
@@ -161,6 +180,7 @@ export default defineComponent({
     });
 
     return {
+      level1,
       queryParams,
       categorys,
       category,
