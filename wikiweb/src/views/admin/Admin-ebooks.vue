@@ -65,11 +65,12 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name"/>
       </a-form-item>
-      <a-form-item label="分类一">
-        <a-input v-model:value="ebook.category1Id"/>
-      </a-form-item>
-      <a-form-item label="分类二">
-        <a-input v-model:value="ebook.category2Id"/>
+      <a-form-item label="分类">
+        <a-cascader
+            v-model:value="categoryIds.list"
+            :field-names="{ label: 'name', value: 'id', children: 'children' }"
+            :options="level1.items"
+        />
       </a-form-item>
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" type="textarea"/>
@@ -82,13 +83,14 @@
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
+import {buildTree, TreeNode} from "@/utils/tool";
 
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
     let queryParams = reactive({name: ''});
     let ebooks = reactive({books: []});//存放当前页展示的电子书
-    let ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', description: ''});//存放当前编辑的电子书的信息
+    let ebook = reactive({id: '', cover: '', name: '', category1Id: '', category2Id: '', description: '', docCount: null, viewCount: null, voteCount: null});//存放当前编辑的电子书的信息
     const state = reactive({loading: false});
     const pagination = reactive({
       current: 1,
@@ -166,7 +168,10 @@ export default defineComponent({
 
     // -------- 表单 ---------
     const modal = reactive({loading: false, visible: false});
+    const categoryIds = reactive<{ list: string[] }>({list: []});
     const handleModalOk = () => {
+      ebook.category1Id = categoryIds.list[0];
+      ebook.category2Id = categoryIds.list[1];
       modal.loading = true;
       axios.post("/ebook/save", ebook).then((response) => {
         const data = response.data;
@@ -190,10 +195,11 @@ export default defineComponent({
     const edit = (record: any) => {
       modal.visible = true;
       Object.assign(ebook, record);//这里将record中的属性复制到ebook中，而不是直接将ebook和record进行绑定，所以更改ebook时，不会影响外部列表中的值
+      categoryIds.list = [ebook.category1Id, ebook.category2Id]
     };
     const add = () => {
       modal.visible = true;
-      Object.assign(ebook, {cover: '', name: '', category1Id: '', category2Id: '', description: ''});
+      Object.assign(ebook, {id: '', cover: '', name: '', category1Id: '', category2Id: '', description: '',docCount: null, viewCount: null, voteCount: null});
     };
 
     const handleDelete = (id: number) => {
@@ -215,12 +221,36 @@ export default defineComponent({
       });
 
     };
+    const level1 = reactive<{ items: TreeNode[] }>({
+      items: []
+    }); // 一级分类树，children属性就是二级分类
+
+    /**
+     * 数据查询
+     **/
+    const handleCategory = () => {
+      state.loading = true;
+      axios.get("/category/all").then((response) => {
+        state.loading = false;
+        const data = response.data;
+        if (data.success) {
+          const categorys = data.content
+          console.log("原始数组：", categorys);
+
+          level1.items = buildTree(categorys, '0');
+          console.log("树形结构：", level1);
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
 
     onMounted(() => {
-      handleQuery({
-        page: 1,
-        size: pagination.pageSize
-      });
+      handleCategory(),
+          handleQuery({
+            page: 1,
+            size: pagination.pageSize
+          });
     });
 
     return {
@@ -231,12 +261,14 @@ export default defineComponent({
       columns,
       state,
       modal,
+      level1,
+      categoryIds,
       handleTableChange,
       handleModalOk,
       handleDelete,
       handleQuery,
       edit,
-      add
+      add,
     }
   }
 });
