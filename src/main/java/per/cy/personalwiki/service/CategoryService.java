@@ -31,6 +31,9 @@ public class CategoryService {
         CategoryExample example = new CategoryExample();
         CategoryExample.Criteria criteria = example.createCriteria();
         PageHelper.startPage(categoryQueryRequest.getPage(), categoryQueryRequest.getSize());
+        if(!ObjectUtils.isEmpty(categoryQueryRequest.getName())){
+            criteria.andNameLike("%" + categoryQueryRequest.getName() + "%");//%是通配符，可以匹配零个或多个任意字符
+        }
         List<Category> categorys = categoryMapper.selectByExample(example);
         PageInfo<Category> pageInfo = new PageInfo<>(categorys);
         logger.info("总行数：{}", pageInfo.getTotal());
@@ -40,6 +43,14 @@ public class CategoryService {
         resp.setList(resList);
         resp.setTotalsPages((int)pageInfo.getTotal());
         return resp;
+    }
+
+    public List<CategoryQueryResp> selectAll() {
+        CategoryExample example = new CategoryExample();
+        example.setOrderByClause("sort asc");
+        List<Category> categorys = categoryMapper.selectByExample(example);
+        List<CategoryQueryResp> resList=CopyUtil.copyList(categorys, CategoryQueryResp.class);
+        return resList;
     }
     public void saveCategory(CategorySaveRequest categorySaveRequest){
         Category category=CopyUtil.copyInstance(categorySaveRequest,Category.class);

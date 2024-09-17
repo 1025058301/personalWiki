@@ -10,6 +10,7 @@ import per.cy.personalwiki.service.CategoryService;
 import per.cy.personalwiki.req.CategoryQueryRequest;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/category")
@@ -21,6 +22,14 @@ public class CategoryController {
     public CommonResp<PageResp<CategoryQueryResp>> getEookList(@Valid CategoryQueryRequest categoryQueryRequest) {
         CommonResp<PageResp<CategoryQueryResp>> commonResp=new CommonResp<>();
         commonResp.setContent(categoryService.selectByExample(categoryQueryRequest));
+        commonResp.setSuccess(true);
+        return commonResp;
+    }
+
+    @RequestMapping("/all")
+    public CommonResp<List<CategoryQueryResp>> getEookList() {
+        CommonResp<List<CategoryQueryResp>> commonResp=new CommonResp<>();
+        commonResp.setContent(categoryService.selectAll());
         commonResp.setSuccess(true);
         return commonResp;
     }

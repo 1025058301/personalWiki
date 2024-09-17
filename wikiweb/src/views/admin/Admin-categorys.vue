@@ -6,15 +6,6 @@
       <p>
         <a-form layout="inline" :model="queryParams">
           <a-form-item>
-            <a-input v-model:value="queryParams.name" placeholder="名称">
-            </a-input>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="handleQuery({page: 1, size: pagination.pageSize})">
-              查询
-            </a-button>
-          </a-form-item>
-          <a-form-item>
             <a-button type="primary" @click="add()">
               新增
             </a-button>
@@ -25,9 +16,8 @@
           :columns="columns"
           :row-key="record => record.id"
           :data-source="categorys.items"
-          :pagination="pagination"
+          :pagination="false"
           :loading="state.loading"
-          @change="handleTableChange"
       >
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
@@ -82,13 +72,8 @@ export default defineComponent({
   setup() {
     let queryParams = reactive({name: ''});
     let categorys = reactive({items: []});//存放当前页展示的分类
-    let category = reactive({ name: '', parent: '', sort: ''});//存放当前编辑的分类的信息
+    let category = reactive({name: '', parent: '', sort: ''});//存放当前编辑的分类的信息
     const state = reactive({loading: false});
-    const pagination = reactive({
-      current: 1,
-      pageSize: 4,
-      total: 0
-    });
 
     const columns = [
       {
@@ -114,16 +99,14 @@ export default defineComponent({
     /**
      * 数据查询
      **/
-    const handleQuery = (params: any) => {
+    const handleQuery = () => {
       state.loading = true;
-      axios.get("/category/list", {params: {page: params.page, size: params.size, name: queryParams.name}}).then((response) => {
+      axios.get("/category/all").then((response) => {
         state.loading = false;
         const data = response.data;
         if (data.success) {
-          categorys.items = data.content.list;
+          categorys.items = data.content;
           // 重置分页按钮
-          pagination.current = params.page;
-          pagination.total = data.content.totalsPages;
         } else {
           message.error(data.message);
         }
@@ -133,15 +116,8 @@ export default defineComponent({
     /**
      * 表格点击页码时触发
      */
-    const handleTableChange = (pagination: any) => {
-      console.log("看看自带的分页参数都有啥：" + pagination);
-      handleQuery({
-        page: pagination.current,
-        size: pagination.pageSize
-      });
-    };
 
-    // -------- 表单 ---------
+        // -------- 表单 ---------
     const modal = reactive({loading: false, visible: false});
     const handleModalOk = () => {
       modal.loading = true;
@@ -149,10 +125,7 @@ export default defineComponent({
         const data = response.data;
         modal.loading = false;
         if (data.success) {
-          handleQuery({
-            page: pagination.current,
-            size: pagination.pageSize,
-          });
+          handleQuery();
           modal.visible = false;
         } else {
           message.error(data.message);
@@ -177,38 +150,23 @@ export default defineComponent({
       axios.delete("/category/delete/" + id).then((response) => {
         const data = response.data;
         if (data.success) {
-          if (categorys.items.length == 1 && pagination.current > 1) {
-            handleQuery({
-              page: pagination.current - 1,
-              size: pagination.pageSize,
-            });
-          } else {
-            handleQuery({
-              page: pagination.current,
-              size: pagination.pageSize,
-            });
-          }
+          handleQuery();
         }
       });
 
     };
 
     onMounted(() => {
-      handleQuery({
-        page: 1,
-        size: pagination.pageSize
-      });
+      handleQuery();
     });
 
     return {
       queryParams,
       categorys,
       category,
-      pagination,
       columns,
       state,
       modal,
-      handleTableChange,
       handleModalOk,
       handleDelete,
       handleQuery,
