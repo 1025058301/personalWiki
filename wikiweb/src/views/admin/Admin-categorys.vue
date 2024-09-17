@@ -53,7 +53,17 @@
         <a-input v-model:value="category.name"/>
       </a-form-item>
       <a-form-item label="父分类">
-        <a-input v-model:value="category.parent"/>
+        <a-select
+            v-model:value="category.parent"
+            ref="select"
+        >
+          <a-select-option value="0">
+            无
+          </a-select-option>
+          <a-select-option v-for="c in level1.items" :key="c.id" :value="c.id" :disabled="category.id === c.id">
+            {{c.name}}
+          </a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item label="顺序">
         <a-input v-model:value="category.sort"/>
@@ -73,7 +83,7 @@ export default defineComponent({
   setup() {
     let queryParams = reactive({name: ''});
     let categorys = reactive({items: []});//存放当前页展示的分类
-    let category = reactive({name: '', parent: '', sort: ''});//存放当前编辑的分类的信息
+    let category = reactive({id:'',name: '', parent: '', sort: ''});//存放当前编辑的分类的信息
     const state = reactive({loading: false});
 
     const columns = [
@@ -162,7 +172,7 @@ export default defineComponent({
     };
     const add = () => {
       modal.visible = true;
-      Object.assign(category, {name: '', parent: '', category2Id: '', description: ''});
+      Object.assign(category, {id:'', name: '', parent: '', sort: ''});
     };
 
     const handleDelete = (id: number) => {
