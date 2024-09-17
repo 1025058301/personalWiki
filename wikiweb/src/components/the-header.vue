@@ -16,6 +16,9 @@
       <a-menu-item key="admin">
         <router-link to="/admin/ebook">wiki书目管理</router-link>
       </a-menu-item>
+      <a-menu-item key="category">
+        <router-link to="/admin/category">wiki分类管理</router-link>
+      </a-menu-item>
     </a-menu>
   </a-layout-header>
 </template>

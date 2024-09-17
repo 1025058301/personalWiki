@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
 import About from "@/views/About.vue";
 import AdminEbooks from "@/views/admin/Admin-ebooks.vue";
+import AdminCategory from "@/views/admin/Admin-categorys.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +22,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/admin/ebook',
     name: 'AdminEbooks',
     component: AdminEbooks
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+  },
+  {
+    path: '/admin/category',
+    name: 'AdminCategory',
+    component: AdminCategory
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
