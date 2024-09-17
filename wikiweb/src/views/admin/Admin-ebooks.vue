@@ -4,9 +4,22 @@
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
       <p>
-        <a-button type="primary" @click="add()" size="large">
-          新增
-        </a-button>
+        <a-form layout="inline" :model="queryParams">
+          <a-form-item>
+            <a-input v-model:value="queryParams.name" placeholder="名称">
+            </a-input>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="handleQuery({page: 1, size: pagination.pageSize})">
+              查询
+            </a-button>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="add()">
+              新增
+            </a-button>
+          </a-form-item>
+        </a-form>
       </p>
       <a-table
           :columns="columns"
@@ -68,11 +81,12 @@
 <script lang="ts">
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
-import { message } from 'ant-design-vue';
+import {message} from 'ant-design-vue';
 
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
+    let queryParams = reactive({name: ''});
     let ebooks = reactive({books: []});//存放当前页展示的电子书
     let ebook = reactive({cover: '', name: '', category1Id: '', category2Id: '', description: ''});//存放当前编辑的电子书的信息
     const state = reactive({loading: false});
@@ -125,15 +139,15 @@ export default defineComponent({
      **/
     const handleQuery = (params: any) => {
       state.loading = true;
-      axios.get("/ebook/list", {params: {page: params.page, size: params.size}}).then((response) => {
+      axios.get("/ebook/list", {params: {page: params.page, size: params.size, name: queryParams.name}}).then((response) => {
         state.loading = false;
         const data = response.data;
-        if(data.success){
+        if (data.success) {
           ebooks.books = data.content.list;
           // 重置分页按钮
           pagination.current = params.page;
           pagination.total = data.content.totalsPages;
-        }else {
+        } else {
           message.error(data.message);
         }
       });
@@ -156,14 +170,14 @@ export default defineComponent({
       modal.loading = true;
       axios.post("/ebook/save", ebook).then((response) => {
         const data = response.data;
-        modal.loading=false;
-        if(data.success){
+        modal.loading = false;
+        if (data.success) {
           handleQuery({
             page: pagination.current,
             size: pagination.pageSize,
           });
-          modal.visible=false;
-        }else {
+          modal.visible = false;
+        } else {
           message.error(data.message);
         }
       });
@@ -175,23 +189,23 @@ export default defineComponent({
      */
     const edit = (record: any) => {
       modal.visible = true;
-      Object.assign(ebook,record)
+      Object.assign(ebook, record);//这里将record中的属性复制到ebook中，而不是直接将ebook和record进行绑定，所以更改ebook时，不会影响外部列表中的值
     };
     const add = () => {
       modal.visible = true;
       Object.assign(ebook, {cover: '', name: '', category1Id: '', category2Id: '', description: ''});
     };
 
-    const handleDelete = (id:number) => {
-      axios.delete("/ebook/delete/"+id).then((response) => {
+    const handleDelete = (id: number) => {
+      axios.delete("/ebook/delete/" + id).then((response) => {
         const data = response.data;
-        if(data.success){
-          if(ebooks.books.length==1 && pagination.current > 1){
+        if (data.success) {
+          if (ebooks.books.length == 1 && pagination.current > 1) {
             handleQuery({
-              page: pagination.current-1,
+              page: pagination.current - 1,
               size: pagination.pageSize,
             });
-          }else {
+          } else {
             handleQuery({
               page: pagination.current,
               size: pagination.pageSize,
@@ -210,6 +224,7 @@ export default defineComponent({
     });
 
     return {
+      queryParams,
       ebooks,
       ebook,
       pagination,
@@ -219,6 +234,7 @@ export default defineComponent({
       handleTableChange,
       handleModalOk,
       handleDelete,
+      handleQuery,
       edit,
       add
     }
