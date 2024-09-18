@@ -67,6 +67,9 @@
       <a-form-item label="顺序">
         <a-input v-model:value="doc.sort"/>
       </a-form-item>
+      <a-form-item label="内容">
+        <div id="content"></div>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -78,6 +81,7 @@ import {message, Modal} from 'ant-design-vue';
 import { Item, TreeNode, buildTree } from '@/utils/tool'
 import {useRoute} from "vue-router";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
+import E from 'wangeditor'
 
 export default defineComponent({
   name: 'AdminDoc',
@@ -236,6 +240,7 @@ export default defineComponent({
       });
 
     };
+    const editor = new E('#content');
 
     /**
      * 编辑
@@ -257,6 +262,9 @@ export default defineComponent({
       treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
       console.log("打印修改后的树型结构")
       console.log(treeSelectData)
+      setTimeout(function () {
+        editor.create();
+      }, 100);
     };
     const add = () => {
       modal.visible = true;
@@ -266,6 +274,9 @@ export default defineComponent({
       doc.ebookId=route.query.ebookId as string
       treeSelectData.items = JSON.parse(JSON.stringify(level1.items));
       treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
+      setTimeout(function () {
+        editor.create();
+      }, 100);
     };
 
     const handleDelete = (id: number) => {
