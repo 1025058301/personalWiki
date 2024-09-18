@@ -227,6 +227,21 @@ export default defineComponent({
     };
 
     /**
+     * 富文本查询
+     **/
+
+    const handleQueryContent = () => {
+      axios.get("/doc/getContent/"+doc.id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          editor.txt.html(data.content)
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+    /**
      * 表格点击页码时触发
      */
 
@@ -239,8 +254,8 @@ export default defineComponent({
         const data = response.data;
         modal.loading = false;
         if (data.success) {
+          message.success("保存成功！");
           handleQuery();
-          modal.visible = false;
         } else {
           message.error(data.message);
         }
@@ -255,24 +270,22 @@ export default defineComponent({
      */
     const edit = (record: any) => {
       modal.visible = true;
+      editor.txt.html("");
       Object.assign(doc, record);//这里将record中的属性复制到doc中，而不是直接将doc和record进行绑定，所以更改doc时，不会影响外部列表中的值
-      console.log("add打印doc")
-      console.log(doc)
-      console.log("add打印record")
-      console.log(record)
-      // console.log("打印level1内容")
-      // console.log(level1.items)
+      handleQueryContent();
+
       // treeSelectData.items = level1.items.map(item => ({ ...item }));
       treeSelectData.items = JSON.parse(JSON.stringify(level1.items));
       // console.log("打印树型结构")
       // console.log(treeSelectData.items)
       setDisable(treeSelectData.items, record.id);
       treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
-      console.log("打印修改后的树型结构")
-      console.log(treeSelectData)
+      // console.log("打印修改后的树型结构")
+      // console.log(treeSelectData)
     };
     const add = () => {
       modal.visible = true;
+      editor.txt.html("");
       Object.assign(doc, {ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null,content:''});
       console.log("add打印doc")
       console.log(doc)

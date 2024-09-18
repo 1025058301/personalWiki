@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 public class DocService {
-    public static Logger logger= LoggerFactory.getLogger(DocService.class);
+    public static Logger logger = LoggerFactory.getLogger(DocService.class);
     @Autowired
     DocMapper docMapper;
     @Autowired
@@ -31,6 +31,7 @@ public class DocService {
 
     @Autowired
     SnowFlake snowFlake;
+
     public PageResp<DocQueryResp> selectByExample(DocQueryRequest docQueryRequest) {
         DocExample example = new DocExample();
         DocExample.Criteria criteria = example.createCriteria();
@@ -39,10 +40,10 @@ public class DocService {
         PageInfo<Doc> pageInfo = new PageInfo<>(docs);
         logger.info("总行数：{}", pageInfo.getTotal());
         logger.info("总页数：{}", pageInfo.getPages());
-        List<DocQueryResp> resList=CopyUtil.copyList(docs, DocQueryResp.class);
-        PageResp<DocQueryResp> resp=new PageResp<>();
+        List<DocQueryResp> resList = CopyUtil.copyList(docs, DocQueryResp.class);
+        PageResp<DocQueryResp> resp = new PageResp<>();
         resp.setList(resList);
-        resp.setTotalsPages((int)pageInfo.getTotal());
+        resp.setTotalsPages((int) pageInfo.getTotal());
         return resp;
     }
 
@@ -50,18 +51,19 @@ public class DocService {
         DocExample example = new DocExample();
         example.setOrderByClause("sort asc");
         List<Doc> docs = docMapper.selectByExample(example);
-        List<DocQueryResp> resList=CopyUtil.copyList(docs, DocQueryResp.class);
+        List<DocQueryResp> resList = CopyUtil.copyList(docs, DocQueryResp.class);
         return resList;
     }
-    public void saveDoc(DocSaveRequest docSaveRequest){
-        Doc doc=CopyUtil.copyInstance(docSaveRequest,Doc.class);
-        Content content=CopyUtil.copyInstance(docSaveRequest,Content.class);
-        if(ObjectUtils.isEmpty(doc.getId())){
+
+    public void saveDoc(DocSaveRequest docSaveRequest) {
+        Doc doc = CopyUtil.copyInstance(docSaveRequest, Doc.class);
+        Content content = CopyUtil.copyInstance(docSaveRequest, Content.class);
+        if (ObjectUtils.isEmpty(doc.getId())) {
             doc.setId(snowFlake.nextId());
             docMapper.insert(doc);
             content.setId(doc.getId());
             contentMapper.insert(content);
-        }else {
+        } else {
             docMapper.updateByPrimaryKey(doc);
             int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
             if (count == 0) {
@@ -69,13 +71,21 @@ public class DocService {
             }
         }
     }
-    public void deleteDoc(long id){
+
+    public void deleteDoc(long id) {
         docMapper.deleteByPrimaryKey(id);
     }
+
     public void deleteDoc(List<String> ids) {
         DocExample docExample = new DocExample();
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andIdIn(ids);
         docMapper.deleteByExample(docExample);
+    }
+
+    public String selectContent(long id) {
+        Content content=contentMapper.selectByPrimaryKey(id);
+        return content.getContent();
+
     }
 }
