@@ -40,6 +40,6 @@
                              targetPackage="per.cy.personalwiki.mapper"
                              type="XMLMAPPER"/>
 
-        <table tableName="doc" domainObjectName="Doc"/>
+        <table tableName="content" domainObjectName="Content"/>
     </context>
 </generatorConfiguration>
