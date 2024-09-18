@@ -4,19 +4,19 @@
       <a-menu
           mode="inline"
           :style="{ height: '100%', borderRight: 0 }"
+          @click="handleClick"
       >
         <a-menu-item key="welcome">
-          <router-link :to="'/'">
-            <MailOutlined />
-            <span>欢迎</span>
-          </router-link>
+          <MailOutlined/>
+          <span>欢迎</span>
         </a-menu-item>
-        <a-sub-menu v-for="item in level1.items" :key="item.id">
+        <a-sub-menu v-for="item in level1.items" :key="item.id" @titleClick=handleClick({})>
           <template v-slot:title>
-            <span><user-outlined />{{item.name}}</span>
+            <span><user-outlined/>{{ item.name }}</span>
           </template>
           <a-menu-item v-for="child in item.children" :key="child.id">
-            <MailOutlined /><span>{{child.name}}</span>
+            <MailOutlined/>
+            <span>{{ child.name }}</span>
           </a-menu-item>
         </a-sub-menu>
       </a-menu>
@@ -24,7 +24,11 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px',flex:1 }"
     >
-      <a-list item-layout="vertical" size="large" :grid="{ gutter: 20, column: 4 }" :data-source="ebooks.books">
+      <div class="welcome" v-show="isShowWelcome.show">
+        <h1>欢迎使用知识库</h1>
+      </div>
+      <a-list item-layout="vertical" v-show="!isShowWelcome.show" size="large" :grid="{ gutter: 20, column: 4 }"
+              :data-source="ebooks.books">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
@@ -99,11 +103,24 @@ export default defineComponent({
       })
     });
     state.loading = false;
+
+    //菜单点击逻辑
+    const isShowWelcome = reactive({show: true});
+    const handleClick = (value: any) => {
+      if (value.key == 'welcome') {
+        isShowWelcome.show = true;
+      } else {
+        isShowWelcome.show = false;
+      }
+    }
+
     return {
       state,
       ebooks,
       level1,
+      isShowWelcome,
       handleCategory,
+      handleClick,
       pagination: {
         onChange: (page: any) => {
           console.log(page);
