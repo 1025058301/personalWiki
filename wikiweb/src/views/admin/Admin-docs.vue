@@ -53,17 +53,16 @@
         <a-input v-model:value="doc.name"/>
       </a-form-item>
       <a-form-item label="父文档">
-        <a-select
+        <a-tree-select
             v-model:value="doc.parent"
-            ref="select"
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            :tree-data="treeSelectData.items"
+            placeholder="请选择父文档"
+            tree-default-expand-all
+            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
         >
-          <a-select-option value="0">
-            无
-          </a-select-option>
-          <a-select-option v-for="c in level1.items" :key="c.id" :value="c.id" :disabled="doc.id === c.id">
-            {{c.name}}
-          </a-select-option>
-        </a-select>
+        </a-tree-select>
       </a-form-item>
       <a-form-item label="顺序">
         <a-input v-model:value="doc.sort"/>
@@ -83,7 +82,7 @@ export default defineComponent({
   setup() {
     let queryParams = reactive({name: ''});
     let docs = reactive({items: []});//存放当前页展示的文档
-    let doc = reactive({id:'',name: '', parent: '', sort: ''});//存放当前编辑的文档的信息
+    let doc = reactive({ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null});//存放当前编辑的文档的信息
     const state = reactive({loading: false});
 
     const columns = [
@@ -120,6 +119,42 @@ export default defineComponent({
     const level1 = reactive<{ items: TreeNode[] }>({
       items: []
     }); // 一级文档树，children属性就是二级文档
+    const treeSelectData = reactive<{ items: TreeNode[] }>({
+      items: []
+    });
+
+    /**
+     * 将某节点及其子孙节点全部置为disabled
+     */
+    const setDisable = (treeSelectData: any, id: any) => {
+      // console.log(treeSelectData, id);
+      // 遍历数组，即遍历某一层节点
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i];
+        if (node.id === id) {
+          // 如果当前节点就是目标节点
+          console.log("disabled", node);
+          // 将目标节点设置为disabled
+          node.disabled = true;
+
+          // 遍历所有子节点，将所有子节点全部都加上disabled
+          if ('children' in node) {
+            const children=node.children
+            for (let j = 0; j < children.length; j++) {
+              setDisable(children, children[j].id)
+            }
+          }
+        } else {
+          // 如果当前节点不是目标节点，则到其子节点再找找看。
+          const children = node.children;
+          if ('children' in node) {
+            const children=node.children;
+            setDisable(children, id);
+          }
+        }
+      }
+    };
+
 
     /**
      * 数据查询
@@ -131,11 +166,8 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           docs.items = data.content;
-          console.log("原始数组：", docs.items);
-
           level1.items = buildTree(docs.items,'0');
           console.log(buildTree(docs.items,'0'));
-          console.log("树形结构：", level1);
         } else {
           message.error(data.message);
         }
@@ -169,10 +201,28 @@ export default defineComponent({
     const edit = (record: any) => {
       modal.visible = true;
       Object.assign(doc, record);//这里将record中的属性复制到doc中，而不是直接将doc和record进行绑定，所以更改doc时，不会影响外部列表中的值
+      console.log("add打印doc")
+      console.log(doc)
+      console.log("add打印record")
+      console.log(record)
+      // console.log("打印level1内容")
+      // console.log(level1.items)
+      // treeSelectData.items = level1.items.map(item => ({ ...item }));
+      treeSelectData.items = JSON.parse(JSON.stringify(level1.items));
+      // console.log("打印树型结构")
+      // console.log(treeSelectData.items)
+      setDisable(treeSelectData.items, record.id);
+      treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
+      console.log("打印修改后的树型结构")
+      console.log(treeSelectData)
     };
     const add = () => {
       modal.visible = true;
-      Object.assign(doc, {id:'', name: '', parent: '', sort: ''});
+      Object.assign(doc, {ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null});
+      console.log("add打印doc")
+      console.log(doc)
+      treeSelectData.items = JSON.parse(JSON.stringify(level1.items));
+      treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
     };
 
     const handleDelete = (id: number) => {
@@ -182,7 +232,6 @@ export default defineComponent({
           handleQuery();
         }
       });
-
     };
 
     onMounted(() => {
@@ -197,6 +246,7 @@ export default defineComponent({
       columns,
       state,
       modal,
+      treeSelectData,
       handleModalOk,
       handleDelete,
       handleQuery,
