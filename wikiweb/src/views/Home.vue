@@ -4,17 +4,18 @@
       <a-menu
           mode="inline"
           :style="{ height: '100%', borderRight: 0 }"
-          @click="handleClick"
       >
-        <a-menu-item key="welcome">
+        <a-menu-item key="welcome " @Click="() => handleClick({ key: 'welcome' })">
           <MailOutlined/>
           <span>欢迎</span>
         </a-menu-item>
-        <a-sub-menu v-for="item in level1.items" :key="item.id" @titleClick=handleClick({})>
+        <a-sub-menu v-for="item in level1.items" :key="item.id"
+                    @titleClick="() => handleClick({ category1Id: item.id })" )>
           <template v-slot:title>
             <span><user-outlined/>{{ item.name }}</span>
           </template>
-          <a-menu-item v-for="child in item.children" :key="child.id">
+          <a-menu-item v-for="child in item.children" :key="child.id"
+                       @Click="() => handleClick({ category2Id: child.id })">
             <MailOutlined/>
             <span>{{ child.name }}</span>
           </a-menu-item>
@@ -94,22 +95,34 @@ export default defineComponent({
     onMounted(() => {
       handleCategory();
       console.log("on Mounted");
+    });
+    const handleQueryEbooks = (value: any) => {
+      state.loading = false;
       axios.get("/ebook/list", {
-        params: {page: 1, size: 100}
+        params: {
+          page: 1,
+          size: 100,
+          category1Id: value.category1Id,
+          category2Id: value.category2Id
+        }
       }).then((response) => {
         console.log(response);
         const data = response.data;
         ebooks.books = data.content.list;
       })
-    });
-    state.loading = false;
-
+    }
     //菜单点击逻辑
     const isShowWelcome = reactive({show: true});
     const handleClick = (value: any) => {
+      console.log(value);
       if (value.key == 'welcome') {
         isShowWelcome.show = true;
       } else {
+        if ('category1Id' in value) {
+          handleQueryEbooks({category1Id: value.category1Id})
+        }else if('category2Id' in value){
+          handleQueryEbooks({category2Id: value.category2Id})
+        }
         isShowWelcome.show = false;
       }
     }

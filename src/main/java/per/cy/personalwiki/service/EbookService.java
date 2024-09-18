@@ -28,12 +28,18 @@ public class EbookService {
     @Autowired
     SnowFlake snowFlake;
     public PageResp<EbookQueryResp> selectByExample(EbookQueryRequest ebookQueryRequest) {
+        PageHelper.startPage(ebookQueryRequest.getPage(), ebookQueryRequest.getSize());
         EbookExample example = new EbookExample();
         EbookExample.Criteria criteria = example.createCriteria();
         if(!ObjectUtils.isEmpty(ebookQueryRequest.getName())){
             criteria.andNameLike("%" + ebookQueryRequest.getName() + "%");//%是通配符，可以匹配零个或多个任意字符
         }
-        PageHelper.startPage(ebookQueryRequest.getPage(), ebookQueryRequest.getSize());
+        if(!ObjectUtils.isEmpty(ebookQueryRequest.getCategory1Id())){
+            criteria.andCategory1IdEqualTo(ebookQueryRequest.getCategory1Id());
+        }
+        if(!ObjectUtils.isEmpty(ebookQueryRequest.getCategory2Id())){
+            criteria.andCategory2IdEqualTo(ebookQueryRequest.getCategory2Id());
+        }
         List<Ebook> ebooks = ebookMapper.selectByExample(example);
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebooks);
         logger.info("总行数：{}", pageInfo.getTotal());

@@ -4,6 +4,9 @@ public class EbookQueryRequest extends PageRequest {
     private Long id;
 
     private String name;
+    private Long category1Id;
+
+    private Long category2Id;
 
     private String description;
 
@@ -24,6 +27,21 @@ public class EbookQueryRequest extends PageRequest {
         this.name = name;
     }
 
+    public Long getCategory1Id() {
+        return category1Id;
+    }
+
+    public void setCategory1Id(Long category1Id) {
+        this.category1Id = category1Id;
+    }
+
+    public Long getCategory2Id() {
+        return category2Id;
+    }
+
+    public void setCategory2Id(Long category2Id) {
+        this.category2Id = category2Id;
+    }
 
     public String getDescription() {
         return description;
@@ -33,17 +51,14 @@ public class EbookQueryRequest extends PageRequest {
         this.description = description;
     }
 
-
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", name=").append(name);
-        sb.append(", description=").append(description);
-        sb.append("]");
-        return sb.toString();
+        return "EbookQueryRequest{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", category1Id=" + category1Id +
+                ", category2Id=" + category2Id +
+                ", description='" + description + '\'' +
+                "} " + super.toString();
     }
 }
