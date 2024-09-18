@@ -10,6 +10,7 @@ import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.service.DocService;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -39,10 +40,11 @@ public class DocController {
         docService.saveDoc(docSaveRequest);
         return commonResp;
     }
-    @DeleteMapping ("/delete/{id}")
-    public CommonResp deleteDoc(@PathVariable("id")long id) {//RequestBody用于接收json类型的参数
+    @DeleteMapping ("/delete/{idStr}")
+    public CommonResp deleteDoc(@PathVariable("idStr")String idStr) {//RequestBody用于接收json类型的参数
         CommonResp commonResp=new CommonResp<>();
-        docService.deleteDoc(id);
+        List<String> list= Arrays.asList(idStr.split(","));
+        docService.deleteDoc(list);
         return commonResp;
     }
 }
