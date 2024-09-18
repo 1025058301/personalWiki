@@ -113,7 +113,7 @@ export default defineComponent({
       },
       {
         title: '分类',
-        slots: { customRender: 'category' }
+        slots: {customRender: 'category'}
       },
       {
         title: '文档数',
@@ -197,7 +197,7 @@ export default defineComponent({
     };
     const add = () => {
       modal.visible = true;
-      Object.assign(ebook, {id: '', cover: '', name: '', category1Id: '', category2Id: '', description: '',docCount: null, viewCount: null, voteCount: null});
+      Object.assign(ebook, {id: '', cover: '', name: '', category1Id: '', category2Id: '', description: '', docCount: null, viewCount: null, voteCount: null});
     };
 
     const handleDelete = (id: number) => {
@@ -234,9 +234,12 @@ export default defineComponent({
         if (data.success) {
           categorys = data.content
           console.log("原始数组：", categorys);
-
           level1.items = buildTree(categorys, '0');
           console.log("树形结构：", level1);
+          handleQuery({//当得到分类信息后，再获取书籍信息，避免分类信息渲染失败。
+            page: 1,
+            size: pagination.pageSize
+          });
         } else {
           message.error(data.message);
         }
@@ -255,11 +258,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      handleCategory(),
-          handleQuery({
-            page: 1,
-            size: pagination.pageSize
-          });
+      handleCategory()
     });
 
     return {
