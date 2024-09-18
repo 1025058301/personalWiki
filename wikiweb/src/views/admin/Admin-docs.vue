@@ -76,10 +76,21 @@ import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import { Item, TreeNode, buildTree } from '@/utils/tool'
+import {useRoute} from "vue-router";
 
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
+    //路由信息
+    const route = useRoute();
+    console.log("路由：", route);
+    console.log("route.path：", route.path);
+    console.log("route.query：", route.query);
+    console.log("route.param：", route.params);
+    console.log("route.fullPath：", route.fullPath);
+    console.log("route.name：", route.name);
+    console.log("route.meta：", route.meta);
+
     let queryParams = reactive({name: ''});
     let docs = reactive({items: []});//存放当前页展示的文档
     let doc = reactive({ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null});//存放当前编辑的文档的信息
@@ -221,6 +232,7 @@ export default defineComponent({
       Object.assign(doc, {ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null});
       console.log("add打印doc")
       console.log(doc)
+      doc.ebookId=route.query.ebookId as string
       treeSelectData.items = JSON.parse(JSON.stringify(level1.items));
       treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
     };
