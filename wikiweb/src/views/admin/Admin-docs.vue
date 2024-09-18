@@ -112,7 +112,7 @@ export default defineComponent({
 
     let queryParams = reactive({name: ''});
     let docs = reactive({items: []});//存放当前页展示的文档
-    let doc = reactive({ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null});//存放当前编辑的文档的信息
+    let doc = reactive({ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null,content:''});//存放当前编辑的文档的信息
     const state = reactive({loading: false});
 
     const columns = [
@@ -234,6 +234,7 @@ export default defineComponent({
     const modal = reactive({loading: false, visible: false});
     const handleModalSave = () => {
       modal.loading = true;
+      doc.content=editor.txt.html() as string
       axios.post("/doc/save", doc).then((response) => {
         const data = response.data;
         modal.loading = false;
@@ -272,7 +273,7 @@ export default defineComponent({
     };
     const add = () => {
       modal.visible = true;
-      Object.assign(doc, {ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null});
+      Object.assign(doc, {ebookId:'',id:'',name: '', parent: '', sort: '',viewCount: null, voteCount: null,content:''});
       console.log("add打印doc")
       console.log(doc)
       doc.ebookId=route.query.ebookId as string

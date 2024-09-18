@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import per.cy.personalwiki.mapper.ContentMapper;
 import per.cy.personalwiki.mapper.DocMapper;
+import per.cy.personalwiki.pojo.Content;
 import per.cy.personalwiki.pojo.Doc;
 import per.cy.personalwiki.pojo.DocExample;
 import per.cy.personalwiki.req.DocQueryRequest;
@@ -24,6 +26,8 @@ public class DocService {
     public static Logger logger= LoggerFactory.getLogger(DocService.class);
     @Autowired
     DocMapper docMapper;
+    @Autowired
+    ContentMapper contentMapper;
 
     @Autowired
     SnowFlake snowFlake;
@@ -51,11 +55,18 @@ public class DocService {
     }
     public void saveDoc(DocSaveRequest docSaveRequest){
         Doc doc=CopyUtil.copyInstance(docSaveRequest,Doc.class);
+        Content content=CopyUtil.copyInstance(docSaveRequest,Content.class);
         if(ObjectUtils.isEmpty(doc.getId())){
             doc.setId(snowFlake.nextId());
             docMapper.insert(doc);
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         }else {
             docMapper.updateByPrimaryKey(doc);
+            int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if (count == 0) {
+                contentMapper.insert(content);
+            }
         }
     }
     public void deleteDoc(long id){
