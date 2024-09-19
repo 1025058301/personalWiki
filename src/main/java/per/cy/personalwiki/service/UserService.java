@@ -13,9 +13,11 @@ import per.cy.personalwiki.exception.BusinessExceptionCode;
 import per.cy.personalwiki.mapper.UserMapper;
 import per.cy.personalwiki.pojo.User;
 import per.cy.personalwiki.pojo.UserExample;
+import per.cy.personalwiki.req.UserLoginRequest;
 import per.cy.personalwiki.req.UserQueryRequest;
 import per.cy.personalwiki.req.UserResetPasswordRequest;
 import per.cy.personalwiki.req.UserSaveRequest;
+import per.cy.personalwiki.resp.UserLoginResp;
 import per.cy.personalwiki.resp.UserQueryResp;
 import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.utils.CopyUtil;
@@ -81,5 +83,18 @@ public class UserService {
     public void resetPassword(UserResetPasswordRequest req) {
         User user = CopyUtil.copyInstance(req, User.class);
         userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    public UserLoginResp login(UserLoginRequest request){
+        User user=getUserByLoginName(request.getLoginName());
+        if(ObjectUtils.isEmpty(user)){
+            throw new BusinessException(BusinessExceptionCode.USER_LOGIN_FAIL);
+        }else {
+            if(user.getPassword().equals(request.getPassword())){
+                return CopyUtil.copyInstance(user, UserLoginResp.class);
+            }else {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_FAIL);
+            }
+        }
     }
 }

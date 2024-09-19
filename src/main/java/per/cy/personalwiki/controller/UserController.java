@@ -3,10 +3,12 @@ package per.cy.personalwiki.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import per.cy.personalwiki.req.UserLoginRequest;
 import per.cy.personalwiki.req.UserQueryRequest;
 import per.cy.personalwiki.req.UserResetPasswordRequest;
 import per.cy.personalwiki.req.UserSaveRequest;
 import per.cy.personalwiki.resp.CommonResp;
+import per.cy.personalwiki.resp.UserLoginResp;
 import per.cy.personalwiki.resp.UserQueryResp;
 import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.service.UserService;
@@ -44,6 +46,15 @@ public class UserController {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         CommonResp resp = new CommonResp<>();
         userService.resetPassword(req);
+        return resp;
+    }
+
+    @PostMapping("/login")
+    public CommonResp<UserLoginResp> login(@Valid @RequestBody UserLoginRequest req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp<UserLoginResp> resp = new CommonResp<>();
+        UserLoginResp loginResp=userService.login(req);
+        resp.setContent(loginResp);
         return resp;
     }
 }
