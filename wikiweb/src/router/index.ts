@@ -4,6 +4,7 @@ import About from "@/views/About.vue";
 import AdminEbooks from "@/views/admin/Admin-ebooks.vue";
 import AdminCategory from "@/views/admin/Admin-categorys.vue";
 import AdminDocs from "@/views/admin/Admin-docs.vue";
+import Doc from "@/views/Doc.vue"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -39,6 +40,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/admin/doc',
     name: 'AdminDoc',
     component: AdminDocs
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+  },
+  {
+    path: '/doc',
+    name: 'Doc',
+    component: Doc
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
