@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import per.cy.personalwiki.exception.BusinessException;
 import per.cy.personalwiki.resp.CommonResp;
 
 /**
@@ -42,6 +43,17 @@ public class ControllerExceptionHandler {
         String errorMessage = "书目类别应该是数字！ " + ex.getMessage();
         commonResp.setSuccess(false);
         commonResp.setMessage(errorMessage);
+        return commonResp;
+    }
+
+    @ExceptionHandler(value = BusinessException.class)
+    @ResponseBody
+    public CommonResp handleBusinessException(BusinessException ex) {
+        // 自定义错误信息，可以根据异常对象 ex 提取详细信息
+        CommonResp commonResp = new CommonResp();
+        LOG.warn("业务异常：{}", ex.getCode().getDesc());
+        commonResp.setSuccess(false);
+        commonResp.setMessage(ex.getCode().getDesc());
         return commonResp;
     }
 }

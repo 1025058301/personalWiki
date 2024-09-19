@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import per.cy.personalwiki.exception.BusinessException;
+import per.cy.personalwiki.exception.BusinessExceptionCode;
 import per.cy.personalwiki.mapper.UserMapper;
 import per.cy.personalwiki.pojo.User;
 import per.cy.personalwiki.pojo.UserExample;
@@ -47,13 +49,28 @@ public class UserService {
     public void saveUser(UserSaveRequest userSaveRequest){
         User user=CopyUtil.copyInstance(userSaveRequest,User.class);
         if(ObjectUtils.isEmpty(user.getId())){
-            user.setId(snowFlake.nextId());
-            userMapper.insert(user);
+            if(ObjectUtils.isEmpty(getUserByLoginName(user.getLoginName()))){
+                user.setId(snowFlake.nextId());
+                userMapper.insert(user);
+            }else {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
         }else {
             userMapper.updateByPrimaryKey(user);
         }
     }
     public void deleteUser(long id){
         userMapper.deleteByPrimaryKey(id);
+    }
+    public User getUserByLoginName(String loginName){
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andLoginNameEqualTo(loginName);
+        List<User> users = userMapper.selectByExample(example);
+        if(users.isEmpty()){
+            return null;
+        }else {
+            return users.get(0);
+        }
     }
 }
