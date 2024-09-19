@@ -13,6 +13,7 @@
           </a-tree>
         </a-col>
         <a-col :span="18">
+          <div class="wangeditor" :innerHTML="html.content"></div>
         </a-col>
       </a-row>
     </a-layout-content>
@@ -23,7 +24,7 @@
 import {createVNode, defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {message, Modal} from 'ant-design-vue';
-import { Item, TreeNode, buildTree } from '@/utils/tool'
+import {Item, TreeNode, buildTree} from '@/utils/tool'
 import {useRoute} from "vue-router";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import E from 'wangeditor'
@@ -41,8 +42,24 @@ export default defineComponent({
     console.log("route.name：", route.name);
     console.log("route.meta：", route.meta);
 
-    let queryParams = reactive({name: ''});
     let docs = reactive({items: []});//存放当前页展示的文档
+    const html = reactive({content: ''});
+
+    const handleQueryContent = (id: number) => {
+      axios.get("/doc/getContent/" + id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          html.content = data.content;
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+    const onSelect = (selectedKeys: any, info: any) => {
+      console.log('selected', selectedKeys, info);
+      handleQueryContent(selectedKeys[0]);
+    };
 
     /**
      * 一级文档树，children属性就是二级文档
@@ -64,19 +81,17 @@ export default defineComponent({
      * 数据查询
      **/
     const handleQuery = () => {
-      axios.get("/doc/all/"+ route.query.ebookId).then((response) => {
+      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
         const data = response.data;
         if (data.success) {
           docs.items = data.content;
-          level1.items = buildTree(docs.items,'0');
-          console.log(buildTree(docs.items,'0'));
+          level1.items = buildTree(docs.items, '0');
+          console.log(buildTree(docs.items, '0'));
         } else {
           message.error(data.message);
         }
       });
     };
-
-
 
 
     onMounted(() => {
@@ -85,9 +100,66 @@ export default defineComponent({
 
     return {
       level1,
-      queryParams,
-      docs
+      docs,
+      html,
+      onSelect,
     }
   }
 });
 </script>
+
+<style>
+/* wangeditor默认样式, 参照: http://www.wangeditor.com/doc/pages/02-%E5%86%85%E5%AE%B9%E5%A4%84%E7%90%86/03-%E8%8E%B7%E5%8F%96html.html */
+/* table 样式 */
+.wangeditor table {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+}
+.wangeditor table td,
+.wangeditor table th {
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  padding: 3px 5px;
+}
+.wangeditor table th {
+  border-bottom: 2px solid #ccc;
+  text-align: center;
+}
+
+/* blockquote 样式 */
+.wangeditor blockquote {
+  display: block;
+  border-left: 8px solid #d0e5f2;
+  padding: 5px 10px;
+  margin: 10px 0;
+  line-height: 1.4;
+  font-size: 100%;
+  background-color: #f1f1f1;
+}
+
+/* code 样式 */
+.wangeditor code {
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+  background-color: #f1f1f1;
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin: 0 3px;
+}
+.wangeditor pre code {
+  display: block;
+}
+
+/* ul ol 样式 */
+.wangeditor ul, ol {
+  margin: 10px 0 10px 20px;
+}
+
+.wangeditor blockquote p {
+  font-family:"YouYuan";
+  margin: 20px 10px !important;
+  font-size: 16px !important;
+  font-weight:600;
+}
+</style>
