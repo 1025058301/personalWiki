@@ -14,6 +14,7 @@ import per.cy.personalwiki.mapper.UserMapper;
 import per.cy.personalwiki.pojo.User;
 import per.cy.personalwiki.pojo.UserExample;
 import per.cy.personalwiki.req.UserQueryRequest;
+import per.cy.personalwiki.req.UserResetPasswordRequest;
 import per.cy.personalwiki.req.UserSaveRequest;
 import per.cy.personalwiki.resp.UserQueryResp;
 import per.cy.personalwiki.resp.PageResp;
@@ -58,7 +59,8 @@ public class UserService {
                 throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
             }
         }else {
-            user.setLoginName(null);
+            user.setLoginName(null);//修改时不能修改用户名
+            user.setPassword(null);//修改时不修改密码，单独接口修改密码
             userMapper.updateByPrimaryKeySelective(user);
         }
     }
@@ -75,5 +77,9 @@ public class UserService {
         }else {
             return users.get(0);
         }
+    }
+    public void resetPassword(UserResetPasswordRequest req) {
+        User user = CopyUtil.copyInstance(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }

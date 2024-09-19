@@ -31,6 +31,9 @@
       >
         <template v-slot:action="{ text, record }">
           <a-space size="small">
+            <a-button type="primary" @click="resetPassword(record)">
+              重置密码
+            </a-button>
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
@@ -63,7 +66,20 @@
       <a-form-item label="昵称">
         <a-input v-model:value="user.name"/>
       </a-form-item>
-      <a-form-item label="密码">
+      <a-form-item label="密码" v-show="!user.id">
+        <a-input v-model:value="user.password"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
+  <a-modal
+      title="重置密码"
+      v-model:visible="resetModalVisible.visible"
+      :confirm-loading="resetModalLoading.loading"
+      @ok="handleResetModalOk"
+  >
+    <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="新密码">
         <a-input v-model:value="user.password"/>
       </a-form-item>
     </a-form>
@@ -201,6 +217,40 @@ export default defineComponent({
       });
     };
 
+    // -------- 重置密码 ---------
+    const resetModalVisible = reactive({visible:false});
+    const resetModalLoading = reactive({loading:false});
+    const handleResetModalOk = () => {
+      resetModalLoading.loading = true;
+
+      user.password = hexMd5(user.password + KEY);
+
+      axios.post("/user/resetPassword", user).then((response) => {
+        resetModalLoading.loading = false;
+        const data = response.data; // data = commonResp
+        if (data.success) {
+          resetModalVisible.visible = false;
+
+          // 重新加载列表
+          handleQuery({
+            page: pagination.current,
+            size: pagination.pageSize,
+          });
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+    /**
+     * 重置密码
+     */
+    const resetPassword = (record: any) => {
+      resetModalVisible.visible = true;
+      Object.assign(user, record);
+      user.password = '';
+    };
+
     onMounted(() => {
       handleQuery({
         page: 1,
@@ -224,8 +274,11 @@ export default defineComponent({
       modalVisible,
       modalLoading,
       handleModalOk,
-
-      handleDelete
+      handleDelete,
+      resetModalVisible,
+      resetModalLoading,
+      handleResetModalOk,
+      resetPassword
     }
   }
 });
