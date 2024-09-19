@@ -47,10 +47,11 @@
   </a-modal>
 </template>
 <script lang="ts">
-import {defineComponent, reactive} from 'vue';
+import {computed, defineComponent, reactive} from 'vue';
 import {ref} from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
+import store from "@/store";
 
 declare let hexMd5: any;
 declare let KEY: any;
@@ -58,7 +59,7 @@ declare let KEY: any;
 export default defineComponent({
   name: 'the-header',
   setup () {
-    const user = reactive({id:'',loginName:'',name:'',token:''});
+    const user = computed(() => store.state.user);
     const loginUser = reactive({
       loginName: "test",
       password: "test"
@@ -77,12 +78,11 @@ export default defineComponent({
       axios.post('/user/login', loginUser).then((response) => {
         loginModalLoading.loading = false;
         const data = response.data;
-        Object.assign(user, data.content);
-        console.log("user")
-        console.log(user)
         if (data.success) {
           loginModalVisible.visible = false;
           message.success("登录成功！");
+          store.commit("setUser", data.content);
+          console.log(data.content)
         } else {
           message.error(data.message);
         }
