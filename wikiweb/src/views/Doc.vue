@@ -2,18 +2,21 @@
   <a-layout>
     <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
       <a-row>
-        <a-col :span="6">
+        <a-col :span="4">
           <a-tree
               v-if="level1.items.length > 0"
               :tree-data="level1.items"
               @select="onSelect"
               :replaceFields="{title: 'name', key: 'id', value: 'id'}"
               :defaultExpandAll="true"
+              :style="{ fontSize: '16px' }"
           >
           </a-tree>
         </a-col>
-        <a-col :span="18">
+        <a-col :span="16">
           <div class="wangeditor" :innerHTML="html.content"></div>
+        </a-col>
+        <a-col :span="4">
         </a-col>
       </a-row>
     </a-layout-content>

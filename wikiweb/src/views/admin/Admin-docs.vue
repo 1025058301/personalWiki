@@ -252,6 +252,9 @@ export default defineComponent({
     const handleModalSave = () => {
       modal.loading = true;
       doc.content=editor.txt.html() as string
+      if(doc.ebookId==''){
+        doc.ebookId=route.query.ebookId as string
+      }
       axios.post("/doc/save", doc).then((response) => {
         const data = response.data;
         modal.loading = false;
