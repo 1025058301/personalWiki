@@ -58,13 +58,13 @@
   >
     <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="登陆名">
-        <a-input v-model:value="user.loginName" />
+        <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
       </a-form-item>
       <a-form-item label="昵称">
-        <a-input v-model:value="user.name" />
+        <a-input v-model:value="user.name"/>
       </a-form-item>
       <a-form-item label="密码">
-        <a-input v-model:value="user.password" />
+        <a-input v-model:value="user.password"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -73,19 +73,19 @@
 <script lang="ts">
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
-import { message } from 'ant-design-vue';
+import {message} from 'ant-design-vue';
 
 export default defineComponent({
   name: 'AdminUser',
   setup() {
-    const param = reactive({loginName:''});
-    const users = reactive({users:[]});
+    const param = reactive({loginName: ''});
+    const users = reactive({users: []});
     const pagination = reactive({
       current: 1,
       pageSize: 100,
       total: 0
     });
-    const loading = reactive({loading:false});
+    const loading = reactive({loading: false});
 
     const columns = [
       {
@@ -103,7 +103,7 @@ export default defineComponent({
       {
         title: 'Action',
         key: 'action',
-        slots: { customRender: 'action' }
+        slots: {customRender: 'action'}
       }
     ];
 
@@ -147,9 +147,9 @@ export default defineComponent({
     };
 
     // -------- 表单 ---------
-    const user = reactive({id: '', loginName: '', name: '', password:''});
-    const modalVisible = reactive({visible:false});
-    const modalLoading = reactive({loading:false});
+    const user = reactive({id: '', loginName: '', name: '', password: ''});
+    const modalVisible = reactive({visible: false});
+    const modalLoading = reactive({loading: false});
     const handleModalOk = () => {
       modalLoading.loading = true;
       axios.post("/user/save", user).then((response) => {
@@ -182,7 +182,7 @@ export default defineComponent({
      */
     const add = () => {
       modalVisible.visible = true;
-      Object.assign(user, {id: '', loginName: '', name: '', password:''});
+      Object.assign(user, {id: '', loginName: '', name: '', password: ''});
     };
 
     const handleDelete = (id: number) => {
