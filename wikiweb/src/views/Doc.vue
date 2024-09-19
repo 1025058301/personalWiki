@@ -2,7 +2,7 @@
   <a-layout>
     <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
       <a-row>
-        <a-col :span="4">
+        <a-col :span="6">
           <a-tree
               v-if="level1.items.length > 0"
               :tree-data="level1.items"
@@ -13,7 +13,7 @@
           >
           </a-tree>
         </a-col>
-        <a-col :span="16">
+        <a-col :span="14">
           <div class="wangeditor" :innerHTML="html.content"></div>
         </a-col>
         <a-col :span="4">
