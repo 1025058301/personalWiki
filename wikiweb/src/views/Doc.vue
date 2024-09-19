@@ -9,6 +9,7 @@
               @select="onSelect"
               :replaceFields="{title: 'name', key: 'id', value: 'id'}"
               :defaultExpandAll="true"
+              :defaultSelectedKeys="defaultSelectedKeys.items"
               :style="{ fontSize: '16px' }"
           >
           </a-tree>
@@ -58,6 +59,8 @@ export default defineComponent({
         }
       });
     };
+    const defaultSelectedKeys = reactive<{ items: string[] }>({items:[]});
+
 
     const onSelect = (selectedKeys: any, info: any) => {
       console.log('selected', selectedKeys, info);
@@ -90,6 +93,12 @@ export default defineComponent({
           docs.items = data.content;
           level1.items = buildTree(docs.items, '0');
           console.log(buildTree(docs.items, '0'));
+          if (level1.items.length!=0) {
+            defaultSelectedKeys.items = [level1.items[0].id];
+            console.log("level1")
+            console.log(level1.items[0])
+            handleQueryContent(level1.items[0].id as unknown as number);
+          }
         } else {
           message.error(data.message);
         }
@@ -106,6 +115,7 @@ export default defineComponent({
       docs,
       html,
       onSelect,
+      defaultSelectedKeys
     }
   }
 });
