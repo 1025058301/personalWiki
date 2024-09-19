@@ -1,6 +1,10 @@
 package per.cy.personalwiki.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import per.cy.personalwiki.req.UserLoginRequest;
@@ -12,14 +16,24 @@ import per.cy.personalwiki.resp.UserLoginResp;
 import per.cy.personalwiki.resp.UserQueryResp;
 import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.service.UserService;
+import per.cy.personalwiki.utils.SnowFlake;
 
 import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+    public static Logger logger= LoggerFactory.getLogger(UserController.class);
     @Autowired
     UserService userService;
+
+    @Autowired
+    RedisTemplate redisTemplate;
+
+    @Autowired
+    SnowFlake snowFlake;
 
     @RequestMapping("/list")
     public CommonResp<PageResp<UserQueryResp>> getUserList(@Valid UserQueryRequest userQueryRequest) {
@@ -54,6 +68,11 @@ public class UserController {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         CommonResp<UserLoginResp> resp = new CommonResp<>();
         UserLoginResp loginResp=userService.login(req);
+
+        Long token=snowFlake.nextId();
+        logger.info("生成单点登录token：{}，并放入redis中", token);
+        loginResp.setToken(token.toString());
+        redisTemplate.opsForValue().set(token, JSONObject.toJSONString(loginResp), 3600 * 24, TimeUnit.SECONDS);
         resp.setContent(loginResp);
         return resp;
     }

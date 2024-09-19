@@ -21,7 +21,10 @@
       <a-menu-item key="category">
         <router-link to="/admin/category">wiki分类管理</router-link>
       </a-menu-item>
-      <a class="login-menu" @click="showLoginModal">
+      <a class="login-menu" v-show="user.id">
+        <span>您好：{{user.name}}</span>
+      </a>
+      <a class="login-menu" v-show="!user.id" @click="showLoginModal">
         <span>登录</span>
       </a>
     </a-menu>
@@ -55,6 +58,7 @@ declare let KEY: any;
 export default defineComponent({
   name: 'the-header',
   setup () {
+    const user = reactive({id:'',loginName:'',name:'',token:''});
     const loginUser = reactive({
       loginName: "test",
       password: "test"
@@ -73,6 +77,9 @@ export default defineComponent({
       axios.post('/user/login', loginUser).then((response) => {
         loginModalLoading.loading = false;
         const data = response.data;
+        Object.assign(user, data.content);
+        console.log("user")
+        console.log(user)
         if (data.success) {
           loginModalVisible.visible = false;
           message.success("登录成功！");
@@ -87,7 +94,8 @@ export default defineComponent({
       loginModalLoading,
       showLoginModal,
       loginUser,
-      login
+      login,
+      user
     }
   }
 });
