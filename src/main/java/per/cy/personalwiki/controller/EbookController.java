@@ -18,7 +18,7 @@ public class EbookController {
     EbookService ebookService;
 
     @RequestMapping("/list")
-    public CommonResp<PageResp<EbookQueryResp>> getEookList(@Valid EbookQueryRequest ebookQueryRequest) {
+    public CommonResp<PageResp<EbookQueryResp>> getEbookList(@Valid EbookQueryRequest ebookQueryRequest) {
         CommonResp<PageResp<EbookQueryResp>> commonResp=new CommonResp<>();
         commonResp.setContent(ebookService.selectByExample(ebookQueryRequest));
         commonResp.setSuccess(true);

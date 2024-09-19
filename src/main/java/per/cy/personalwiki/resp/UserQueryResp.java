@@ -1,6 +1,6 @@
-package per.cy.personalwiki.pojo;
+package per.cy.personalwiki.resp;
 
-public class User {
+public class UserQueryResp {
     private Long id;
 
     private String loginName;

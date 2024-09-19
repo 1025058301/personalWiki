@@ -25,6 +25,7 @@
                         connectionURL="jdbc:mysql://localhost:3306/wiki?characterEncoding=UTF8&amp;autoReconnect=true&amp;serverTimezone=Asia/Shanghai"
                         userId="root"
                         password="10251107">
+            <property name="nullCatalogMeansCurrent" value="true" />
         </jdbcConnection>
 
         <!-- domain类的位置 -->
