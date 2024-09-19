@@ -74,6 +74,8 @@
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
+declare let hexMd5: any;
+declare let KEY: any;
 
 export default defineComponent({
   name: 'AdminUser',
@@ -152,6 +154,7 @@ export default defineComponent({
     const modalLoading = reactive({loading: false});
     const handleModalOk = () => {
       modalLoading.loading = true;
+      user.password = hexMd5(user.password + KEY);
       axios.post("/user/save", user).then((response) => {
         modalLoading.loading = false;
         const data = response.data; // data = commonResp

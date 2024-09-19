@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import per.cy.personalwiki.exception.BusinessException;
 import per.cy.personalwiki.exception.BusinessExceptionCode;
@@ -48,6 +49,7 @@ public class UserService {
     }
     public void saveUser(UserSaveRequest userSaveRequest){
         User user=CopyUtil.copyInstance(userSaveRequest,User.class);
+        user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
         if(ObjectUtils.isEmpty(user.getId())){
             if(ObjectUtils.isEmpty(getUserByLoginName(user.getLoginName()))){
                 user.setId(snowFlake.nextId());
