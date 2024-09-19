@@ -213,13 +213,15 @@ export default defineComponent({
      **/
     const handleQuery = () => {
       state.loading = true;
-      axios.get("/doc/all").then((response) => {
+      axios.get("/doc/all/"+ route.query.ebookId).then((response) => {
         state.loading = false;
         const data = response.data;
         if (data.success) {
           docs.items = data.content;
           level1.items = buildTree(docs.items,'0');
           console.log(buildTree(docs.items,'0'));
+          treeSelectData.items = JSON.parse(JSON.stringify(level1.items));
+          treeSelectData.items.unshift({id: '0', name: '无',parent:'0',sort:0})
         } else {
           message.error(data.message);
         }

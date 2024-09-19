@@ -18,16 +18,8 @@ public class CategoryController {
     @Autowired
     CategoryService categoryService;
 
-    @RequestMapping("/list")
-    public CommonResp<PageResp<CategoryQueryResp>> getEookList(@Valid CategoryQueryRequest categoryQueryRequest) {
-        CommonResp<PageResp<CategoryQueryResp>> commonResp=new CommonResp<>();
-        commonResp.setContent(categoryService.selectByExample(categoryQueryRequest));
-        commonResp.setSuccess(true);
-        return commonResp;
-    }
-
     @RequestMapping("/all")
-    public CommonResp<List<CategoryQueryResp>> getEookList() {
+    public CommonResp<List<CategoryQueryResp>> getCategoryList() {
         CommonResp<List<CategoryQueryResp>> commonResp=new CommonResp<>();
         commonResp.setContent(categoryService.selectAll());
         commonResp.setSuccess(true);

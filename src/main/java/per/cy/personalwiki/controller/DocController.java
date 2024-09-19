@@ -19,18 +19,10 @@ public class DocController {
     @Autowired
     DocService docService;
 
-    @RequestMapping("/list")
-    public CommonResp<PageResp<DocQueryResp>> getEookList(@Valid DocQueryRequest docQueryRequest) {
-        CommonResp<PageResp<DocQueryResp>> commonResp=new CommonResp<>();
-        commonResp.setContent(docService.selectByExample(docQueryRequest));
-        commonResp.setSuccess(true);
-        return commonResp;
-    }
-
-    @RequestMapping("/all")
-    public CommonResp<List<DocQueryResp>> getEookList() {
+    @RequestMapping("/all/{ebookId}")
+    public CommonResp<List<DocQueryResp>> getDocList(@PathVariable("ebookId")long ebookId) {
         CommonResp<List<DocQueryResp>> commonResp=new CommonResp<>();
-        commonResp.setContent(docService.selectAll());
+        commonResp.setContent(docService.selectAll(ebookId));
         commonResp.setSuccess(true);
         return commonResp;
     }
