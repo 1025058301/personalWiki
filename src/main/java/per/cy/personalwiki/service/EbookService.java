@@ -65,4 +65,8 @@ public class EbookService {
     public void deleteEbook(long id){
         ebookMapper.deleteByPrimaryKey(id);
     }
+
+    public void updateDocViewVoteCount(){
+        ebookMapper.updateDocViewVoteCount();
+    }
 }
