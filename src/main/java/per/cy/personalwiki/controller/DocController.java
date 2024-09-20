@@ -47,4 +47,12 @@ public class DocController {
         commonResp.setSuccess(true);
         return commonResp;
     }
+
+    @RequestMapping("/vote/{id}")
+    public CommonResp<String> vote(@PathVariable("id")long id) {
+        CommonResp<String> commonResp=new CommonResp<>();
+        docService.vote(id);
+        commonResp.setSuccess(true);
+        return commonResp;
+    }
 }

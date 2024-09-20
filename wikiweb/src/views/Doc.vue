@@ -25,6 +25,11 @@
             <a-divider style="height: 2px; background-color: #9999cc"/>
           </div>
           <div class="wangeditor" :innerHTML="html.content"></div>
+          <div class="vote-div">
+            <a-button type="primary" shape="round" :size="'large'" @click="vote">
+              <template #icon><LikeOutlined /> &nbsp;点赞：{{doc.voteCount}} </template>
+            </a-button>
+          </div>
         </a-col>
         <a-col :span="4">
         </a-col>
@@ -56,7 +61,7 @@ export default defineComponent({
     console.log("route.meta：", route.meta);
 
     let docs = reactive({items: []});//存放当前页展示的文档
-    let doc = reactive({ebookId: '', id: '', name: '', parent: '', sort: '', viewCount: null, voteCount: null, content: ''});//存放当前编辑的文档的信息
+    let doc = reactive({ebookId: '', id: '', name: '', parent: '', sort: '', viewCount: 0, voteCount: 0, content: ''});//存放当前编辑的文档的信息
     const html = reactive({content: ''});
 
     const handleQueryContent = (id: number) => {
@@ -74,8 +79,10 @@ export default defineComponent({
 
     const onSelect = (selectedKeys: any, info: any) => {
       console.log('selected', selectedKeys, info);
-      Object.assign(doc, info.selectedNodes[0].props);
       handleQueryContent(selectedKeys[0]);
+      // doc=info.selectedNodes[0].props
+      // handleQuery();
+      Object.assign(doc, info.selectedNodes[0].props);
     };
 
     /**
@@ -92,6 +99,28 @@ export default defineComponent({
     const level1 = reactive<{ items: TreeNode[] }>({
       items: []
     }); // 一级文档树，children属性就是二级文档
+
+    const setVoteCount = (treeSelectData: any, id: any) => {
+      // console.log(treeSelectData, id);
+      // 遍历数组，即遍历某一层节点
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i];
+        if (node.id === id) {
+          // 如果当前节点就是目标节点
+          console.log("vote+1", node);
+          node.voteCount++;
+          // 遍历所有子节点，将所有子节点全部都加上disabled
+          return
+        } else {
+          // 如果当前节点不是目标节点，则到其子节点再找找看。
+          const children = node.children;
+          if ('children' in node) {
+            const children=node.children;
+            setVoteCount(children, id);
+          }
+        }
+      }
+    };
 
 
     /**
@@ -116,6 +145,17 @@ export default defineComponent({
         }
       });
     };
+    const vote = () => {
+      axios.get('/doc/vote/' + doc.id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          doc.voteCount++;
+          setVoteCount(level1.items,doc.id)
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
 
 
     onMounted(() => {
@@ -128,7 +168,8 @@ export default defineComponent({
       doc,
       html,
       onSelect,
-      defaultSelectedKeys
+      defaultSelectedKeys,
+      vote
     }
   }
 });
@@ -190,5 +231,11 @@ export default defineComponent({
   margin: 20px 10px !important;
   font-size: 16px !important;
   font-weight: 600;
+}
+
+/* 点赞 */
+.vote-div {
+  padding: 15px;
+  text-align: center;
 }
 </style>

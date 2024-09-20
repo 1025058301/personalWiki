@@ -87,8 +87,12 @@ public class DocService {
     }
 
     public String selectContent(long id) {
-        Content content=contentMapper.selectByPrimaryKey(id);
+        Content content = contentMapper.selectByPrimaryKey(id);
         docMapper.increaseViewCount(id);
         return content.getContent();
+    }
+
+    public void vote(long id) {
+        docMapper.increaseVoteCount(id);
     }
 }
