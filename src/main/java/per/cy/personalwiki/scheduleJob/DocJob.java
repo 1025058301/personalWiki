@@ -2,10 +2,12 @@ package per.cy.personalwiki.scheduleJob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import per.cy.personalwiki.service.EbookService;
+import per.cy.personalwiki.utils.SnowFlake;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +18,8 @@ public class DocJob {
     private static final Logger logger = LoggerFactory.getLogger(DocJob.class);
     @Autowired
     EbookService ebookService;
+    @Autowired
+    SnowFlake snowFlake;
 
     /**
      * 固定时间间隔，fixedRate单位毫秒
@@ -34,6 +38,7 @@ public class DocJob {
      */
     @Scheduled(cron = "5/60 * * * * ?")
     public void cron() throws InterruptedException {
+        MDC.put("LOG_ID",String.valueOf(snowFlake.nextId()));
         logger.info("定时更新电子书统计数据开始");
         long current=System.currentTimeMillis();
         ebookService.updateDocViewVoteCount();

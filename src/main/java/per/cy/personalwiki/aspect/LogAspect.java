@@ -8,11 +8,14 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import per.cy.personalwiki.utils.RequestContext;
+import per.cy.personalwiki.utils.SnowFlake;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -21,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Component
 public class LogAspect {
+    @Autowired
+    SnowFlake snowFlake;
 
     private final static Logger LOG = LoggerFactory.getLogger(LogAspect.class);
 
@@ -33,6 +38,7 @@ public class LogAspect {
 
     @Before("controllerPointcut()")
     public void doBefore(JoinPoint joinPoint) throws Throwable {
+        MDC.put("LOG_ID",String.valueOf(snowFlake.nextId()));
 
         // 开始打印请求日志
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
