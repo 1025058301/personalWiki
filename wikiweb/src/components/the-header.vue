@@ -12,13 +12,13 @@
       <a-menu-item key="about">
         <router-link to="/about">关于</router-link>
       </a-menu-item>
-      <a-menu-item key="user">
+      <a-menu-item key="user" v-if="user.id">
         <router-link to="/admin/user">用户管理</router-link>
       </a-menu-item>
-      <a-menu-item key="admin">
+      <a-menu-item key="admin" v-if="user.id">
         <router-link to="/admin/ebook">wiki书目管理</router-link>
       </a-menu-item>
-      <a-menu-item key="category">
+      <a-menu-item key="category" v-if="user.id">
         <router-link to="/admin/category">wiki分类管理</router-link>
       </a-menu-item>
       <a-popconfirm
