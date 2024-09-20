@@ -4,8 +4,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import per.cy.personalwiki.exception.BusinessException;
 import per.cy.personalwiki.exception.BusinessExceptionCode;
@@ -41,7 +43,7 @@ public class DocService {
     RedisUtil redisUtil;
 
     @Autowired
-    WebSocketServer webSocketServer;
+    WebSocketService webSocketService;
 
     public PageResp<DocQueryResp> selectByExample(DocQueryRequest docQueryRequest) {
         DocExample example = new DocExample();
@@ -67,6 +69,7 @@ public class DocService {
         return resList;
     }
 
+    @Transactional
     public void saveDoc(DocSaveRequest docSaveRequest) {
         Doc doc = CopyUtil.copyInstance(docSaveRequest, Doc.class);
         Content content = CopyUtil.copyInstance(docSaveRequest, Content.class);
@@ -109,7 +112,8 @@ public class DocService {
         if(redisUtil.validateRepeat(voteToken,3600*24)){
             docMapper.increaseVoteCount(id);
             Doc docDb=docMapper.selectByPrimaryKey(id);
-            webSocketServer.sendInfo("文档【" + docDb.getName() + "】被点赞！");
+            String logId=MDC.get("LOG_ID");
+            webSocketService.sendInfo("文档【" + docDb.getName() + "】被点赞！",logId);
         }else {
             throw new BusinessException(BusinessExceptionCode.USER_VOTE_REPEAT);
         }
