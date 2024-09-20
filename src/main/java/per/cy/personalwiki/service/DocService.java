@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import per.cy.personalwiki.exception.BusinessException;
+import per.cy.personalwiki.exception.BusinessExceptionCode;
 import per.cy.personalwiki.mapper.ContentMapper;
 import per.cy.personalwiki.mapper.DocMapper;
 import per.cy.personalwiki.pojo.Content;
@@ -17,6 +19,8 @@ import per.cy.personalwiki.req.DocSaveRequest;
 import per.cy.personalwiki.resp.DocQueryResp;
 import per.cy.personalwiki.resp.PageResp;
 import per.cy.personalwiki.utils.CopyUtil;
+import per.cy.personalwiki.utils.RedisUtil;
+import per.cy.personalwiki.utils.RequestContext;
 import per.cy.personalwiki.utils.SnowFlake;
 
 import java.util.List;
@@ -31,6 +35,9 @@ public class DocService {
 
     @Autowired
     SnowFlake snowFlake;
+
+    @Autowired
+    RedisUtil redisUtil;
 
     public PageResp<DocQueryResp> selectByExample(DocQueryRequest docQueryRequest) {
         DocExample example = new DocExample();
@@ -93,6 +100,12 @@ public class DocService {
     }
 
     public void vote(long id) {
-        docMapper.increaseVoteCount(id);
+        String remoteIp= RequestContext.getRemoteIp();
+        String voteToken="Vote_"+remoteIp+"_"+id;
+        if(redisUtil.validateRepeat(voteToken,3600*24)){
+            docMapper.increaseVoteCount(id);
+        }else {
+            throw new BusinessException(BusinessExceptionCode.USER_VOTE_REPEAT);
+        }
     }
 }
