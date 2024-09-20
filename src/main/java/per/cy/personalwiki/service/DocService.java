@@ -22,6 +22,7 @@ import per.cy.personalwiki.utils.CopyUtil;
 import per.cy.personalwiki.utils.RedisUtil;
 import per.cy.personalwiki.utils.RequestContext;
 import per.cy.personalwiki.utils.SnowFlake;
+import per.cy.personalwiki.websocket.WebSocketServer;
 
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class DocService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    WebSocketServer webSocketServer;
 
     public PageResp<DocQueryResp> selectByExample(DocQueryRequest docQueryRequest) {
         DocExample example = new DocExample();
@@ -104,6 +108,8 @@ public class DocService {
         String voteToken="Vote_"+remoteIp+"_"+id;
         if(redisUtil.validateRepeat(voteToken,3600*24)){
             docMapper.increaseVoteCount(id);
+            Doc docDb=docMapper.selectByPrimaryKey(id);
+            webSocketServer.sendInfo("文档【" + docDb.getName() + "】被点赞！");
         }else {
             throw new BusinessException(BusinessExceptionCode.USER_VOTE_REPEAT);
         }
