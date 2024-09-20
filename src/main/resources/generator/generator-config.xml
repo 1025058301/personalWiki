@@ -41,6 +41,6 @@
                              targetPackage="per.cy.personalwiki.mapper"
                              type="XMLMAPPER"/>
 
-        <table tableName="user" domainObjectName="User"/>
+        <table tableName="ebook_snapshot" domainObjectName="EbookSnapshot"/>
     </context>
 </generatorConfiguration>
