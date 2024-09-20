@@ -61,6 +61,8 @@ public class DocService {
         Content content = CopyUtil.copyInstance(docSaveRequest, Content.class);
         if (ObjectUtils.isEmpty(doc.getId())) {
             doc.setId(snowFlake.nextId());
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
             content.setId(doc.getId());
             contentMapper.insert(content);
@@ -86,7 +88,7 @@ public class DocService {
 
     public String selectContent(long id) {
         Content content=contentMapper.selectByPrimaryKey(id);
+        docMapper.increaseViewCount(id);
         return content.getContent();
-
     }
 }

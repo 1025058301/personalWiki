@@ -16,6 +16,14 @@
           </a-tree>
         </a-col>
         <a-col :span="14">
+          <div>
+            <h2>{{ doc.name }}</h2>
+            <div>
+              <span>阅读数：{{ doc.viewCount }}</span> &nbsp; &nbsp;
+              <span>点赞数：{{ doc.voteCount }}</span>
+            </div>
+            <a-divider style="height: 2px; background-color: #9999cc"/>
+          </div>
           <div class="wangeditor" :innerHTML="html.content"></div>
         </a-col>
         <a-col :span="4">
@@ -48,6 +56,7 @@ export default defineComponent({
     console.log("route.meta：", route.meta);
 
     let docs = reactive({items: []});//存放当前页展示的文档
+    let doc = reactive({ebookId: '', id: '', name: '', parent: '', sort: '', viewCount: null, voteCount: null, content: ''});//存放当前编辑的文档的信息
     const html = reactive({content: ''});
 
     const handleQueryContent = (id: number) => {
@@ -60,11 +69,12 @@ export default defineComponent({
         }
       });
     };
-    const defaultSelectedKeys = reactive<{ items: string[] }>({items:[]});
+    const defaultSelectedKeys = reactive<{ items: string[] }>({items: []});
 
 
     const onSelect = (selectedKeys: any, info: any) => {
       console.log('selected', selectedKeys, info);
+      Object.assign(doc, info.selectedNodes[0].props);
       handleQueryContent(selectedKeys[0]);
     };
 
@@ -94,11 +104,12 @@ export default defineComponent({
           docs.items = data.content;
           level1.items = buildTree(docs.items, '0');
           console.log(buildTree(docs.items, '0'));
-          if (level1.items.length!=0) {
+          if (level1.items.length != 0) {
             defaultSelectedKeys.items = [level1.items[0].id];
             console.log("level1")
             console.log(level1.items[0])
             handleQueryContent(level1.items[0].id as unknown as number);
+            Object.assign(doc, level1.items[0]);
           }
         } else {
           message.error(data.message);
@@ -114,6 +125,7 @@ export default defineComponent({
     return {
       level1,
       docs,
+      doc,
       html,
       onSelect,
       defaultSelectedKeys
@@ -129,12 +141,14 @@ export default defineComponent({
   border-top: 1px solid #ccc;
   border-left: 1px solid #ccc;
 }
+
 .wangeditor table td,
 .wangeditor table th {
   border-bottom: 1px solid #ccc;
   border-right: 1px solid #ccc;
   padding: 3px 5px;
 }
+
 .wangeditor table th {
   border-bottom: 2px solid #ccc;
   text-align: center;
@@ -161,6 +175,7 @@ export default defineComponent({
   padding: 3px 5px;
   margin: 0 3px;
 }
+
 .wangeditor pre code {
   display: block;
 }
@@ -171,9 +186,9 @@ export default defineComponent({
 }
 
 .wangeditor blockquote p {
-  font-family:"YouYuan";
+  font-family: "YouYuan";
   margin: 20px 10px !important;
   font-size: 16px !important;
-  font-weight:600;
+  font-weight: 600;
 }
 </style>
