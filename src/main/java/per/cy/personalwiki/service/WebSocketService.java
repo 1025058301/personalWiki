@@ -13,7 +13,7 @@ public class WebSocketService {
     public static Logger logger= LoggerFactory.getLogger(WebSocketService.class);
     @Autowired
     WebSocketServer webSocketServer;
-    @Async
+    @Async("asyncTaskExecutor")
     public void sendInfo(String msg,String logId){
         MDC.put("LOG_ID",logId);
         logger.info("异步执行通知操作，当前线程名-{}",Thread.currentThread().getName());
