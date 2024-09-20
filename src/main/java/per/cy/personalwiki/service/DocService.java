@@ -1,11 +1,13 @@
 package per.cy.personalwiki.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -27,6 +29,7 @@ import per.cy.personalwiki.utils.SnowFlake;
 import per.cy.personalwiki.websocket.WebSocketServer;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class DocService {
@@ -41,6 +44,9 @@ public class DocService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Autowired
     WebSocketService webSocketService;
@@ -87,6 +93,7 @@ public class DocService {
                 contentMapper.insert(content);
             }
         }
+        redisTemplate.opsForValue().set(String.valueOf(doc.getId()), content.getContent(), 3600 * 24, TimeUnit.SECONDS);
     }
 
     public void deleteDoc(long id) {
@@ -101,9 +108,19 @@ public class DocService {
     }
 
     public String selectContent(long id) {
-        Content content = contentMapper.selectByPrimaryKey(id);
+        Object object = redisTemplate.opsForValue().get(String.valueOf(id));
+        String content=null;
+        if(object==null){
+            logger.info("缓存中没有该文档，从数据库中查");
+            content = contentMapper.selectByPrimaryKey(id).getContent();
+            redisTemplate.opsForValue().set(String.valueOf(id), content, 3600 * 24, TimeUnit.SECONDS);
+        }else {
+            logger.info("缓存中有该文档，直接获取");
+            content=object.toString();
+            logger.info(content);
+        }
         docMapper.increaseViewCount(id);
-        return content.getContent();
+        return content;
     }
 
     public void vote(long id) {
