@@ -1,6 +1,6 @@
 <template>
   <a-layout-header class="header">
-    <div class="logo"/>
+    <div class="logo">知识库</div>
     <a-menu
         theme="dark"
         mode="horizontal"
@@ -8,9 +8,6 @@
     >
       <a-menu-item key="home">
         <router-link to="/">首页</router-link>
-      </a-menu-item>
-      <a-menu-item key="about">
-        <router-link to="/about">关于</router-link>
       </a-menu-item>
       <a-menu-item key="user" v-if="user.id">
         <router-link to="/admin/user">用户管理</router-link>
@@ -132,5 +129,14 @@ export default defineComponent({
   color: white;
   margin-right: 100px;
   padding-left: 10px;
+}
+.logo {
+  width: 120px;
+  height: 31px;
+  background: rgba(10, 9, 9, 0.2);
+  margin: 16px 28px 16px 40px;
+  float: left;
+  color: white;
+  font-size: 18px;
 }
 </style>

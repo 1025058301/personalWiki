@@ -2,7 +2,7 @@
 
 <template>
   <a-layout-footer style="text-align: center">
-    个人知识库 <span v-show="user.id">，欢迎：{{user.name}}</span>
+    个人知识库@cy2024 <span v-show="user.id">，欢迎：{{user.name}}</span>
   </a-layout-footer>
 </template>
 <script lang="ts">
