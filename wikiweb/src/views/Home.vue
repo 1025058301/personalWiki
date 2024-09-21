@@ -6,7 +6,6 @@
           :style="{ height: '100%', borderRight: 0 }"
       >
         <a-menu-item key="welcome " @Click="() => handleClick({ key: 'welcome' })">
-          <MailOutlined/>
           <span>欢迎</span>
         </a-menu-item>
         <a-sub-menu v-for="item in level1.items" :key="item.id"
@@ -26,7 +25,7 @@
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px',flex:1 }"
     >
       <div class="welcome" v-show="isShowWelcome.show">
-        <h1>欢迎使用知识库</h1>
+        <TheWelcome></TheWelcome>
       </div>
       <a-list item-layout="vertical" v-show="!isShowWelcome.show" size="large" :grid="{ gutter: 20, column: 4 }"
               :data-source="ebooks.books">
@@ -70,12 +69,14 @@ import {defineComponent, onMounted, reactive, ref, toRef} from 'vue';
 import axios from 'axios';
 import {buildTree, TreeNode} from "@/utils/tool";
 import {message} from "ant-design-vue";
+import TheWelcome from "@/components/the-welcome.vue";
 
 export default defineComponent({
   components: {
     UserOutlined,
     LaptopOutlined,
     NotificationOutlined,
+    TheWelcome,
   },
   setup() {
     const level1 = reactive<{ items: TreeNode[] }>({
