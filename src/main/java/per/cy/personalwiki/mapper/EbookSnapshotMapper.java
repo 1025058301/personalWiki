@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import per.cy.personalwiki.pojo.EbookSnapshot;
 import per.cy.personalwiki.pojo.EbookSnapshotExample;
+import per.cy.personalwiki.resp.StatisticResp;
 
 public interface EbookSnapshotMapper {
     long countByExample(EbookSnapshotExample example);
@@ -29,4 +30,6 @@ public interface EbookSnapshotMapper {
     int updateByPrimaryKey(EbookSnapshot record);
 
     void genSnapshot();
+
+    List<StatisticResp> getStatistic();
 }
