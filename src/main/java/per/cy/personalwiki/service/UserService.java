@@ -53,6 +53,7 @@ public class UserService {
     public void saveUser(UserSaveRequest userSaveRequest){
         User user=CopyUtil.copyInstance(userSaveRequest,User.class);
         user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
+        logger.info("test对应的密码:{}",user.getPassword());
         if(ObjectUtils.isEmpty(user.getId())){
             if(ObjectUtils.isEmpty(getUserByLoginName(user.getLoginName()))){
                 user.setId(snowFlake.nextId());

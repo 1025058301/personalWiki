@@ -112,7 +112,10 @@ public class DocService {
         String content=null;
         if(object==null){
             logger.info("缓存中没有该文档，从数据库中查");
-            content = contentMapper.selectByPrimaryKey(id).getContent();
+            Content contentDb = contentMapper.selectByPrimaryKey(id);
+            if(!ObjectUtils.isEmpty(contentDb)){
+                content=contentDb.getContent();
+            }
             redisTemplate.opsForValue().set(String.valueOf(id), content, 3600 * 24, TimeUnit.SECONDS);
         }else {
             logger.info("缓存中有该文档，直接获取");
