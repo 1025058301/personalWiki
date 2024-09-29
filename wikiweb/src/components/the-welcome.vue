@@ -7,7 +7,8 @@
         >
           <h2 style="font-size: 20px; color: #333; text-align: left; font-weight: bold;">欢迎来到我的个人 Wiki 网站</h2>
           <p style="font-size: 16px; color: #666; line-height: 1.6; text-align: justify; margin-top: 10px;">
-            Wiki 中的文档无需登录即可浏览和点赞，文档内容来源于我自己一直以来的一些笔记总结(节选了一部分较为规整的)，后续梳理后或者有新内容会继续增加。
+            Wiki 中的文档无需登录即可浏览和点赞,按钮都可以点击,涉及修改的操作已经加了权限验证。<br>
+            文档内容来源于我自己一直以来的一些笔记总结(节选了一部分较为规整的)，后续梳理后或者有新内容会继续增加。
           </p>
 
           <h3 style="font-size: 18px; color: #333; margin-top: 20px;">聊聊本网站的实现：</h3>
@@ -22,7 +23,7 @@
             <li><span style="color: #1890ff;">2. </span> 文档支持无限级树，即每层节点都可以创建下一层节点，依赖于文档字段的设置和递归构造文档树的方法。</li>
             <li><span style="color: #1890ff;">3. </span> 使用 IP 判断进行点赞去重，WebSocket 推送点赞通知，并且使用线程池异步化点赞和通知的操作。</li>
             <li><span style="color: #1890ff;">4. </span> 定时器定时生成电子书快照，依据快照统计网站的浏览和点赞数据，并使用 ECharts 进行展示。</li>
-            <li><span style="color: #1890ff;">5. </span> SQL 使用分页查询，对文档表大字段和小字段进行了垂直拆分，使用 Redis 缓存文档内容，减少查询耗时。</li>
+            <li><span style="color: #1890ff;">5. </span> 雪花算法生成唯一主键,SQL使用分页查询，对文档表大字段和小字段进行了垂直拆分，使用 Redis 缓存文档内容，减少查询耗时。</li>
           </ul>
         </a-card>
       </a-col>

@@ -28,7 +28,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'AdminEbooks',
     component: AdminEbooks,
     meta: {
-      loginRequire: true
+      loginRequire: false
     }
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'AdminCategory',
     component: AdminCategory,
     meta: {
-      loginRequire: true
+      loginRequire: false
     }
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -50,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'AdminDoc',
     component: AdminDocs,
     meta: {
-      loginRequire: true
+      loginRequire: false
     }
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route

@@ -175,10 +175,10 @@ export default defineComponent({
     const handleModalOk = () => {
       ebook.category1Id = categoryIds.list[0];
       ebook.category2Id = categoryIds.list[1];
-      modal.loading = true;
+      // modal.loading = true;
       axios.post("/ebook/save", ebook).then((response) => {
         const data = response.data;
-        modal.loading = false;
+        // modal.loading = false;
         if (data.success) {
           handleQuery({
             page: pagination.current,

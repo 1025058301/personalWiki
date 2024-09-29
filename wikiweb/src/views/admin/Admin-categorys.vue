@@ -149,10 +149,10 @@ export default defineComponent({
         // -------- 表单 ---------
     const modal = reactive({loading: false, visible: false});
     const handleModalOk = () => {
-      modal.loading = true;
+      // modal.loading = true;
       axios.post("/category/save", category).then((response) => {
         const data = response.data;
-        modal.loading = false;
+        // modal.loading = false;
         if (data.success) {
           handleQuery();
           modal.visible = false;
