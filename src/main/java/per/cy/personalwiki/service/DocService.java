@@ -10,11 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import per.cy.personalwiki.exception.BusinessException;
 import per.cy.personalwiki.exception.BusinessExceptionCode;
+import per.cy.personalwiki.kafka.KafkaMessageConsumer;
 import per.cy.personalwiki.mapper.ContentMapper;
 import per.cy.personalwiki.mapper.DocMapper;
 import per.cy.personalwiki.pojo.Content;
@@ -50,11 +52,16 @@ public class DocService {
     @Autowired
     RedisTemplate redisTemplate;
 
-    @Autowired
-    WebSocketService webSocketService;
+//    @Autowired
+//    WebSocketService webSocketService;
 
     @Autowired
     RedissonClient redissonClient;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+
 
     public PageResp<DocQueryResp> selectByExample(DocQueryRequest docQueryRequest) {
         DocExample example = new DocExample();
@@ -176,7 +183,9 @@ public class DocService {
             docMapper.increaseVoteCount(id);
             Doc docDb=docMapper.selectByPrimaryKey(id);
             String logId=MDC.get("LOG_ID");
-            webSocketService.sendInfo("文档【" + docDb.getName() + "】被点赞！",logId);
+//            webSocketService.sendInfo("文档【" + docDb.getName() + "】被点赞！",logId);
+            kafkaTemplate.send(KafkaMessageConsumer.voteTOPIC, "文档【" + docDb.getName() + "】被点赞！");
+            logger.info("发生kafka点赞消息");
         }else {
             throw new BusinessException(BusinessExceptionCode.USER_VOTE_REPEAT);
         }

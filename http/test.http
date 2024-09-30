@@ -15,3 +15,7 @@ Accept: application/json
 
 GET http://localhost:8080/demo/redis/get/491967978938699776
 Accept: application/json
+
+###
+GET http://localhost:8080/test/testBloom/lcy
+Accept: application/json

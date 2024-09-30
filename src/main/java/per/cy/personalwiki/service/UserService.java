@@ -51,7 +51,7 @@ public class UserService {
         List<User> users = userMapper.selectByExample(example);
         loginNameBloomFilter = redissonClient.getBloomFilter(LoginNameBloomFilter);
         boolean hasInit =loginNameBloomFilter.tryInit(10000,0.01);
-        if(hasInit){
+        if(!hasInit){
             logger.info("{} 布隆选择器已存在",LoginNameBloomFilter);
         }else {
             logger.info("{} 布隆选择器不存在，现在初始化",LoginNameBloomFilter);
