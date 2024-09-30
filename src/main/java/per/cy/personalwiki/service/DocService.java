@@ -3,6 +3,8 @@ package per.cy.personalwiki.service;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -51,6 +53,9 @@ public class DocService {
     @Autowired
     WebSocketService webSocketService;
 
+    @Autowired
+    RedissonClient redissonClient;
+
     public PageResp<DocQueryResp> selectByExample(DocQueryRequest docQueryRequest) {
         DocExample example = new DocExample();
         DocExample.Criteria criteria = example.createCriteria();
@@ -93,7 +98,7 @@ public class DocService {
                 contentMapper.insert(content);
             }
         }
-        redisTemplate.opsForValue().set(String.valueOf(doc.getId()), content.getContent(), 3600 * 24, TimeUnit.SECONDS);
+//        redisTemplate.opsForValue().set(String.valueOf(doc.getId()), content.getContent(), 3600 * 24, TimeUnit.SECONDS);
     }
 
     public void deleteDoc(long id) {
@@ -109,19 +114,57 @@ public class DocService {
 
     public String selectContent(long id) {
         Object object = redisTemplate.opsForValue().get(String.valueOf(id));
-        String content=null;
-        if(object==null){
+        String content = null;
+
+        // 如果缓存中没有该文档
+        if (object == null) {
             logger.info("缓存中没有该文档，从数据库中查");
-            Content contentDb = contentMapper.selectByPrimaryKey(id);
-            if(!ObjectUtils.isEmpty(contentDb)){
-                content=contentDb.getContent();
+
+            // 获取锁，锁的 key 可以基于文档 id 进行生成
+            String lockKey = "content_lock_" + id;
+            RLock lock = redissonClient.getLock(lockKey);
+
+            try {
+                // 尝试获取锁，等待最多 10 秒，锁定时间为 5 秒
+                if (lock.tryLock(10, 5, TimeUnit.SECONDS)) {
+                    logger.info("已获取到分布式锁");
+                    try {
+                        // 再次检查缓存，避免其他线程已经设置了缓存
+                        object = redisTemplate.opsForValue().get(String.valueOf(id));
+                        if (object == null) {
+                            // 缓存中仍然没有，从数据库中查
+                            Content contentDb = contentMapper.selectByPrimaryKey(id);
+                            if (!ObjectUtils.isEmpty(contentDb)) {
+                                content = contentDb.getContent();
+                            }
+                            // 将数据库查询到的结果写入缓存
+                            redisTemplate.opsForValue().set(String.valueOf(id), content, 3600 * 24, TimeUnit.SECONDS);
+                        } else {
+                            // 如果在等待锁的过程中，缓存中已经有数据了
+                            content = object.toString();
+                            logger.info("缓存中有该文档，直接获取");
+                        }
+                    } finally {
+                        // 释放锁
+                        lock.unlock();
+                        logger.info("分布式锁释放");
+                    }
+                } else {
+                    logger.warn("获取锁失败，可能有其他线程正在处理");
+                    // 等待锁失败后，可以选择直接从缓存中获取（理论上应该缓存已有数据）
+                    object = redisTemplate.opsForValue().get(String.valueOf(id));
+                    content = object != null ? object.toString() : null;
+                }
+            } catch (InterruptedException e) {
+                logger.error("获取锁时出现异常", e);
+                Thread.currentThread().interrupt();  // 恢复线程中断状态
             }
-            redisTemplate.opsForValue().set(String.valueOf(id), content, 3600 * 24, TimeUnit.SECONDS);
-        }else {
+        } else {
             logger.info("缓存中有该文档，直接获取");
-            content=object.toString();
-            logger.info(content);
+            content = object.toString();
         }
+
+        // 增加文档的浏览计数
         docMapper.increaseViewCount(id);
         return content;
     }
