@@ -1,0 +1,12 @@
+#server:
+#  port: 8081
+
+#spring:
+#  redis:
+#    redisson:
+#      config: |
+#        singleServerConfig:
+#          address: "redis://127.0.0.1:6379"
+#          password: null
+singleServerConfig:
+  address: "redis://127.0.0.1:6379"
