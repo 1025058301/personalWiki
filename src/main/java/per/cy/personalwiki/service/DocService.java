@@ -99,12 +99,14 @@ public class DocService {
             content.setId(doc.getId());
             contentMapper.insert(content);
         } else {
+            redisTemplate.delete(String.valueOf(doc.getId()));//第一次删除
             docMapper.updateByPrimaryKey(doc);
             int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
             if (count == 0) {
                 contentMapper.insert(content);
             }
         }
+        kafkaTemplate.send(KafkaMessageConsumer.deleteCacheTOPIC, String.valueOf(doc.getId()));//延迟删除
 //        redisTemplate.opsForValue().set(String.valueOf(doc.getId()), content.getContent(), 3600 * 24, TimeUnit.SECONDS);
     }
 
