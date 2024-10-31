@@ -14,4 +14,12 @@ public class KafkaConfig {
     public NewTopic CacheTOPIC() {
         return new NewTopic("CacheDelete", 3, (short) 1); // 3个分区，2个副本
     }
+    @Bean
+    public NewTopic CacheTOPIC_SECOND() {
+        return new NewTopic("CacheDelete_second", 3, (short) 1); // 3个分区，2个副本
+    }
+    @Bean
+    public NewTopic CacheTOPIC_THIRD() {
+        return new NewTopic("CacheDelete_third", 3, (short) 1); // 3个分区，2个副本
+    }
 }

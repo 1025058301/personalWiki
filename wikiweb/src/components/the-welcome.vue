@@ -26,6 +26,8 @@
             <li><span style="color: #1890ff;">4. </span> 定时器定时生成电子书快照，依据快照统计网站的浏览和点赞数据，并使用 ECharts 进行展示。</li>
             <li><span style="color: #1890ff;">5. </span> 雪花算法生成分布式唯一主键,SQL使用分页查询，对文档表大字段和小字段进行了垂直拆分，Redis缓存文档内容，减少查询耗时。</li>
             <li><span style="color: #1890ff;">6. </span> 使用布隆过滤器判断用户名的存在，使用redis分布式锁确保缓存未命中时只有单个线程访问数据库，解决缓存穿透与缓存击穿问题。</li>
+            <li><span style="color: #1890ff;">7. </span> 使用Kafka和延时队列实现了发生数据更新时缓存的异步延迟双删，保证数据库和缓存的最终一致性。</li>
+
           </ul>
         </a-card>
       </a-col>
@@ -159,7 +161,7 @@ export default defineComponent({
           // console.log(nowRate)
           statistic.todayViewIncrease = parseInt(String(statisticResp[1].viewIncrease / nowRate));
           const viewIncrease0 = statisticResp[0].viewIncrease == 0? 1 : statisticResp[0].viewIncrease;
-          // todayViewIncreaseRate：今日预计增长率
+          // todayViewIncreaseRate：今日预计增长率，今天的预计增长减去昨天的增长/昨天的增长。
           statistic.todayViewIncreaseRate = (statistic.todayViewIncrease - viewIncrease0) / viewIncrease0 * 100;
           statistic.todayViewIncreaseRateAbs = Math.abs(statistic.todayViewIncreaseRate);
         }
