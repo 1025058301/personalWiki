@@ -106,7 +106,8 @@ public class DocService {
                 contentMapper.insert(content);
             }
         }
-        kafkaTemplate.send(KafkaMessageConsumer.deleteCacheTOPIC, String.valueOf(doc.getId()));//延迟删除
+        redisUtil.addCacheDelayTask(String.valueOf(doc.getId()),1000);//向redis添加延时任务
+//        kafkaTemplate.send(KafkaMessageConsumer.deleteCacheTOPIC, String.valueOf(doc.getId()));//延迟删除
 //        redisTemplate.opsForValue().set(String.valueOf(doc.getId()), content.getContent(), 3600 * 24, TimeUnit.SECONDS);
     }
 
